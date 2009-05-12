@@ -1,0 +1,64 @@
+#summary How to Install Mod_authnz_external
+
+== Notes: ==
+ 
+Before installing, note the following:
+
+  *  These instructions are for the current version of `mod_authnz_external`.  The installation procedure for older versions is very similar, and is documented in the INSTALLATION file included in the distribution.
+
+  *  Make sure that you are using the correct version of `mod_auth_external` for you version of Apache:
+    || Apache 2.2 || mod_authnz_external-3.1.x or mod_authnz_external-3.2.x ||
+    || Apache 2.0 || mod_auth_external-2.2.x ||
+    || Apache 1.3 || mod_auth_external-2.1.x ||
+
+    You can check your apache version by running it from the command line with the -v flag.
+
+  *  Originally, `mod_auth_external` was a stand-alone module.  However a new authentication module structure was introduced in Apache-2.1, where `mod_auth_basic` and `mod_auth_digest` are the only top-level authentication modules.  All other authentication modules simply provide authentication services to these modules, and have names starting with "`mod_authn_`" for authentication modules, or "`mod_authz_`" for access control modules, or "`mod_authnz_`" for modules that provide both services.  `Mod_authnz_external` is designed to fit into this new structure.  It has essentially the same features as `mod_auth_external`, but there are differences in the configuration commands.
+
+     It should be noted that it is still possible to use older-style independent authentication modules in Apache 2.2, and `mod_auth_external-2.2.x` can be made to work with only a little difficulty arising from `mod_auth_basic`'s reluctance to be turned off.  See the `mod_auth_external INSTALL` document for information on using it with Apache 2.2.    Do not, however, install both mod_auth_external and mod_authnz_external in your httpd.  I don't know what exactly would happen, but it won't be good.
+
+  *  If you are upgrading from `mod_auth_external` to `mod_authnz_external` read the [UpgradeToNZ Upgrading to Mod_authnz_external] page.
+
+  *  If you want to use `mod_authnz_external` with a hard-coded internal authentication function rather than with an external authenticator, then follow the [HardCode Hard Code Installation instructions] before follow the instructions on this page.
+
+  * Starting with version 3.2.x, mod_authnz_external is designed to work on any platform supported by Apache.  Previous versions were Unix-only.  So mod_authnz_external might work on Windows, but the author doesn't really do Windows development and doesn't even own a Windows C compiler.  So it has not been tested at all, no pre-compiled Windows code is available, and there are no installation instructions for non-Unix platforms.  If you figure any of this out, please consider contributing your findings.
+
+  * There are two ways of installing mod_authnz_external on a Unix system.
+      # You can statically link it with Apache.  This requires rebuilding Apache in such a way that 'mod_authnz_external' will be compiled in.  This is rarely done in modern Apache installations, but might be done if you want to get slightly better performance.
+      # You can make mod_authnz_external a dynamically loaded module.  If your Apache has been built to support dynamically loaded modules you can do this without rebuilding Apache, so it is pretty easy  For information on dynamically loaded modules see http://www.apache.org/docs/dso.html .
+
+    This page gives instructions only for installing Apache as a dynamically loaded module.  There are instructions for installing it statically in the INSTALLATION file in the distribution, but it has been so long since I have done this, that I do not know if they are still correct.
+
+== Step-by-Step Directions ==
+
+=== (1) Check if Dynamically Loaded Modules are Supported ===
+
+Ensure that your Apache server is configured to handle dynamically loaded modules.  These days, nearly all are, but if you want to check this, run Apache server with the -l command flag, like
+{{{
+      httpd -l
+}}}
+If 'mod_so.c' is one of the compiled-in modules, then you are ready to go.  Note that some installations may give the http daemon different names, like 'apache' or 'httpd2'.  Some may have multiple copies of apache sitting in different directories.  Be sure you looking at the one that is being run.
+
+=== (2) Compile the Module ===
+
+Use the following command in the 'mod_authnz_external` distribution directory:
+{{{
+     apxs -c mod_authnz_external.c
+}}}
+'Apxs' is the Apache extension tool.  It is part of the standard Apache distribution.  If you don't have it, then there may be a Apache development package that needs to be installed on your system, or your Apache server may not be set up for handling dynamically loaded modules.  Some systems rename it weirdly, like 'apxs2' in some openSUSE distributions.
+
+Apxs should create a file named '`mod_authnz_external.so`'.
+
+_AIX USERS_:  If you have problems at this point, see the notes in the INSTALLATION FILE.
+
+=== (3) Install the Module ===
+
+Apxs can do this for you too.  Do the following command (as root so you can write to Apache's directories and config files):
+{{{
+       apxs -i -a mod_authnz_external.la
+}}}
+This will create `mod_authnz_external.so` and copy it into the proper place, and add appropriate `AddModule` and `LoadModule` commands to the configuration files.
+
+=== (4) Installation is Complete ===
+
+See the [Configuration] page for how to configure it.

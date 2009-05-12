@@ -193,7 +193,7 @@ Here "check_group()" is some function that looks in your database to see if user
 In all cases (pipe or environment method, password or group authentication), the following additional environment variables will be supplied to the authenticator:
 
 || AUTHTYPE || either "PASS" or "GROUP" depending on whether we are doing password or group authentication.  This is handy if you are using one program to do both. ||
-|| CONTEXT || a string whose value is set by an "AuthExternalContext" directive in the .htaccess file or "<Directory>" block for the directory.  This can be used to select different authentication behaviors in different directories.  It is undefined if there is no "AuthExternalContext" directive. ||
+|| CONTEXT || a string whose value is set by an "AuthExternalContext" directive in the .htaccess file or "`<Directory>`" block for the directory.  This can be used to select different authentication behaviors in different directories.  It is undefined if there is no "AuthExternalContext" directive. ||
 || IP || the client's ip-address. ||
 || HOST || the client's host name, if Apache has "HostnameLookups On". ||
 || PATH || the httpd's path environment variable. ||

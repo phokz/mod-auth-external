@@ -201,40 +201,14 @@ In all cases (pipe or environment method, password or group authentication), the
 || HTTP_HOST || the server's host name, as given in the HTTP request.  May be useful if you have multiple virtual hosts sharing an authenticator. ||
 || URI || the document requested.  This is the URL including any extra path information, but not including the hostname or any CGI arguments.||
 
- These may be useful for logging, or you may want to accept logins from
- certain users only if they are connecting from certain locations or requesting
- certain documents.
+These may be useful for logging, or you may want to accept logins from certain users only if they are connecting from certain locations or requesting certain documents.
 
- Note that if you have configured Apache with "HostnameLookups Off" then HOST
- will usually not be set.  If you really want hostnames, either turn on
- HostnameLookups or do your own gethostbyaddr() calls from the authenticator
- when HOST is not defined.  Note that if the user is coming from an
- unresolvable IP, then hostname lookups can be very slow.
+Note that if you have configured Apache with "HostnameLookups Off" then HOST will usually not be set.  If you really want hostnames, either turn on HostnameLookups or do your own gethostbyaddr() calls from the authenticator when HOST is not defined.  Note that if the user is coming from an unresolvable IP, then hostname lookups can be very slow.
 
- Note that using IP addresses to track a user through your site is not
- reliable.  Users of services like AOL and WebTV use proxy servers, so that
- their IP addresses appear to change constantly since each request may come
- through a different proxy.  A single user's requests for successive pages,
- or for different images on the same page may all come from different IP
- addresses.
+Note that using IP addresses to track a user through your site is not reliable.  Users of services like AOL and WebTV use proxy servers, so that their IP addresses appear to change constantly since each request my come through a different proxy.  A single user's requests for successive pages, or for different images on the same page may all come from different IP addresses.
 
- The PATH environment variable passed to the authenticator is just whatever
- PATH was in effect when Apache was launched, and may differ if the server
- was launched automatically during a reboot or manually by an admin.
- Probably your program should set its own PATH if it needs one.
+The PATH environment variable passed to the authenticator is just whatever PATH was in effect when Apache was launched, and may differ if the server was launched automatically during a reboot or manually by an admin. Probably your program should set its own PATH if it needs one.
 
- The COOKIE environment variable contains all cookies set in the current
- request.  This has the same format as the HTTP_COOKIES ("key=val;key=val")
- passed to a CGI program.  This should be used with caution.  Cookies come
- from the user's computer and might have been created, editted or deleted
- by the user rather than your website.  This severely limits their use for
- authentication.  It is not possible to set cookies from an authentication
- module.
+The COOKIE environment variable contains all cookies set in the current request.  This has the same format as the HTTP_COOKIES ("key=val;key=val") passed to a CGI program.  This should be used with caution.  Cookies come from the user's computer and might have been created, editted or deleted by the user rather than your website.  This severely limits their use for authentication.  It is not possible to set cookies from an authentication module.
 
- The URI variable is there because various people want it.  Mostly it
- is useful not for authentication ("who is this person?") but for access
- control ("is this person permitted to do this?"), and good design usually
- dictates separating those functions.  Strictly speaking, an authenticator
- is not the right place to be doing access control.  However,
- mod_authnz_external is 50% a kludge-builder's tool, so we won't fuss if you
- want to break the rules.
+The URI variable is there because various people want it.  Mostly it is useful not for authentication ("who is this person?") but for access control ("is this person permitted to do this?"), and good design usually dictates separating those functions.  Strictly speaking, an authenticator is not the right place to be doing access control.  However, mod_authnz_external is 50% a kludge-builder's tool, so we won't fuss if you want to break the rules.

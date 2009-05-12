@@ -1,0 +1,297 @@
+            How To Implementation External Authentication Programs
+	       for mod_authnz_external or mod_auth_external
+	       			Version 3.2.0
+
+LANGUAGES
+
+ External authenticators can be written in almost any language.  The sample
+ authenticators in the 'test' directory are in Perl.  The 'pwauth'
+ authenticator is in ANSI C.  The example code fragments in this document
+ are in C.
+
+ If the authenticator is a script rather than a compiled program, it normally
+ has to start with a "#!/bin/sh" or "#!/usr/bin/perl" type directive.  Scripts
+ without such directives may get interpreted by the shell, or may just not
+ work, depending on your installation.
+
+SECURITY
+
+ The authenticator program should be written with great care because it runs
+ as a privileged user and handles privileged data.  A poorly written
+ authenticator could substantially compromise the security of your system.
+ You get points for paranoia.  Some notes:
+
+ - Don't make any assumptions about the length of the login names and
+   passwords given by the user.  I *think* Apache will never pass you ones
+   that are longer than 8192 characters, but don't depend this.  Check very
+   carefully for buffer overflows.
+
+ - Think about locking.  It is possible to get lots of hits at your website
+   very fast, so there may be many programs simultaneously reading your
+   authentication database, plus updates may be going on at the same time.
+   Probably some form of locking is needed to make all this work right.
+
+ - Think about core dumps.  On some systems core dump files can be publically
+   readable.  A core dump from your authenticator is likely to contain the
+   user's plain text password, and may include large chunks of your password
+   database that may have been in buffers.  For C programs on most versions of
+   Unix, it is possible to disable core dumps by doing something like:
+   
+    rlim.rlim_cur = rlim.rlim_max = 0;
+    (void)setrlimit(RLIMIT_CORE, &rlim);
+
+ It may not hurt to spend a little time looking at the features of the pwauth
+ authenticator, which is the most secure external authenticator that I have
+ written.
+
+PASSWORD AUTHENTICATORS
+
+ Authenticators communicate their result by the exit status code they return.
+ A value of 0 indicates that the password is correct.  Other values indicate
+ that the password is incorrect, or something else is wrong.  It can be
+ useful to return different error codes for different kinds of errors.  These
+ will be logged in the Apache error log file, and can be helpful in diagnosing
+ problems.  This version of mod_authnz_external does not have any provision for
+ returning textual error messages from the external authenticator.  You might
+ be able to use syslog() for this.  This might be improved in future releases.
+
+ Returned error codes should not be negative.  Negative values are used
+ internally to mod_authnz_external to indicate problems launching your program.
+
+ How the external authentication program gets its arguments depends on
+ the method used.  The method used is determined by the 'SetExternalAuthMethod'
+ command in your Apache configuration file.  You need implement only the
+ method that you plan to use in your configuration.
+
+ PIPE METHOD
+
+  In the "pipe" method, the arguments are read from standard input.  The
+  user name will be on the first line, and the password will be on the
+  second.  Here's a typical chunk of C code to read that:
+
+  main()
+  {
+      char user[100], password[100], *p;
+
+      if (fgets(user, sizeof(user), stdin) == NULL) exit(2);
+      if ((p= strchr(user, '\n')) == NULL) exit(4)
+      *p= '\0';
+
+      if (fgets(password, sizeof(password), stdin) == NULL) exit(3);
+      if ((p= strchr(password, '\n')) == NULL) exit(5)
+      *p= '\0';
+
+      if (check_password(user, password) == OK)
+           exit(0);	/* Good Password */
+      else
+      	   exit(1);	/* Incorrect Password */
+  }
+
+  Here we simply read two lines from stdin, being careful not to allow
+  buffer overflows and stripping off trailing newlines.
+
+  We assume "check_password()" is some function that checks the validity of a
+  password and returns 'OK' if it is good.
+  
+  Note that we exit with different non-zero error codes in different error
+  cases.  This will be helpful for debugging, as those values will be logged
+  when authentication fails, giving you some clue as to what went wrong.
+  It'd really be better for check_password() to return more detailed error
+  codes, but I wanted to keep the example simple.
+
+ CHECKPASSWORD METHOD
+
+  The "checkpassword" method is identical to the "pipe" method, except
+  that the user name and password are terminated by NUL ('\0') characters
+  instead of newline characters, and they must be read from file descriptor
+  3 instead of standard input.  Documentation for the checkpassword
+  interface is at http://cr.yp.to/checkpwd.html.
+
+ ENVIRONMENT METHOD
+
+  In the "environment" method, the arguments are passed in environment
+  variables.  The user id and the clear-text password are passed in the
+  USER and PASS environment variables respectively.
+  
+  Note that the environment method has fundamental security weaknesses,
+  and should probably not be used.  Use the pipe method instead.
+
+  A typical chunk of C code to authenticate with the environment method
+  might be like:
+
+  main()
+  {
+      char *user, *password;
+
+      if ((user= getenv("USER")) == NULL) exit(2);
+      if ((password= getenv("PASS")) == NULL) exit(3);
+
+      if (check_password(user, password) == OK)
+           exit(0);	/* Good Password */
+      else
+      	   exit(1);	/* Incorrect Password */
+  }
+
+GROUP AUTHENTICATORS
+
+ Security is generally less of a issue with group authenicators, since they
+ are not handling any data as sensitive as clear-text passwords.  They are
+ only passed a user name (presumably already authenticated), and a list of
+ group names.  They exit with status code 0 if that user is in one of those
+ groups, and a non-zero code otherwise.
+
+ In versions of mod_auth_external before 2.1.8, external authenticators were
+ always passed just one group name.  If the Apache "require group" directive
+ listed more than one group, then the external authenticator would be called
+ once with each group name, which could be inefficient if you have a large
+ number of groups.  Mod_auth_external will still behave this way if you
+ issue the "GroupExternalManyAtOnce off" directive.
+
+ Newer versions of mod_auth_external and mod_authnz_external will pass all
+ group names, separated by spaces.  There will only be multiple calls if more
+ than one "require group" directive applies to the same program (e.g., if
+ different parent directories contain such directives in their .htaccess
+ files - for efficiency, this should be avoided).  The list of group names
+ is passed in exactly as they appear on the "require group" directive - if
+ your program can't handle multiple spaces between group names, don't put
+ them there.
+
+ Arguments are passed in a manner similar to password authenticators.  The
+ method used is determined by the 'SetExternalGroupMethod' command in your
+ Apache configuration file.
+
+ ENVIRONMENT METHOD
+
+  In the "environment" method, the arguments are passed in environment
+  variables.  The user id and the group names are passed in the USER and
+  GROUP environment variables respectively.  A typical chunk of C code to
+  fetch the arguments and check each group might be like:
+
+  main()
+  {
+      char *user, *groups, *group;
+
+      if ((user= getenv("USER")) == NULL) exit(2);
+      if ((groups= getenv("GROUP")) == NULL) exit(3);
+
+      group= strtok(groups, " ");
+      while (group != NULL)
+      {
+	  if (check_group(user, group) == OK)
+		exit(0);	/* User is in group */
+          group= strtok(NULL, " ");
+      }
+      exit(1);			/* User is not in any group */
+  }
+
+  Here "check_group()" is some function that looks in your database to see if
+  user is in group and returns 'OK' if he is.
+
+ PIPE METHOD
+
+  In the "pipe" method, the arguments are read from standard input.  The
+  user name will be on the first line, and the group name will be on the
+  second.  Here's a typical chunk of C code to read that:
+
+  main()
+  {
+      char user[100], groups[100], *group, *p;
+
+      if (fgets(user, sizeof(user), stdin) == NULL) exit(2);
+      if ((p= strchr(user, '\n')) == NULL) exit(4)
+      *p= '\0';
+
+      if (fgets(groups, sizeof(groups), stdin) == NULL) exit(3);
+      if ((p= strchr(groups, '\n')) == NULL) exit(5)
+      *p= '\0';
+
+      group= strtok(groups, " ");
+      while (group != NULL)
+      {
+	  if (check_group(user, group) == OK)
+		exit(0);	/* User is in group */
+          group= strtok(NULL, " ");
+      }
+      exit(1);			/* User is not in any group */
+  }
+
+  Here we simply read two lines from stdin, being careful not to allow
+  buffer overflows and stripping off trailing newlines.  We loop through
+  all groups, checking each.
+
+ CHECKPASSWORD METHOD
+
+  Mod_auth_external will happily try to do group authentication via the
+  checkpassword method, piping NUL terminated user and group names to
+  the child process's file descriptor 3, but this isn't actually allowed
+  for in the checkpassword protocol specification, so I don't recommend it.
+
+OTHER ENVIRONMENT VARIABLES
+
+ In all cases (pipe or environment method, password or group authentication),
+ the following additional environment variables will be supplied to the
+ authenticator:
+
+    AUTHTYPE  either "PASS" or "GROUP" depending on whether we are doing
+              password or group authentication.  This is handy if you are
+	      using one program to do both.
+
+    CONTEXT   a string whose value is set by an "AuthExternalContext"
+              directive in the .htaccess file or "<Directory>" block for
+	      the directory.  This can be used to select different
+	      authentication behaviors in different directories.  It is
+	      undefined if there is no "AuthExternalContext" directive.
+
+    IP        the client's ip-address.
+
+    HOST      the client's host name, if Apache has "HostnameLookups On".
+
+    PATH      the httpd's path environment variable.
+
+    COOKIE    all cookie values passed in by the client.
+
+    HTTP_HOST the server's host name, as given in the HTTP request.  May
+              be useful if you have multiple virtual hosts sharing an
+              authenticator.
+
+    URI       the document requested.  This is the URL including any extra
+              path information, but not including the hostname or any CGI
+	      arguments.
+
+ These may be useful for logging, or you may want to accept logins from
+ certain users only if they are connecting from certain locations or requesting
+ certain documents.
+
+ Note that if you have configured Apache with "HostnameLookups Off" then HOST
+ will usually not be set.  If you really want hostnames, either turn on
+ HostnameLookups or do your own gethostbyaddr() calls from the authenticator
+ when HOST is not defined.  Note that if the user is coming from an
+ unresolvable IP, then hostname lookups can be very slow.
+
+ Note that using IP addresses to track a user through your site is not
+ reliable.  Users of services like AOL and WebTV use proxy servers, so that 
+ their IP addresses appear to change constantly since each request may come
+ through a different proxy.  A single user's requests for successive pages,
+ or for different images on the same page may all come from different IP
+ addresses.
+
+ The PATH environment variable passed to the authenticator is just whatever
+ PATH was in effect when Apache was launched, and may differ if the server
+ was launched automatically during a reboot or manually by an admin. 
+ Probably your program should set its own PATH if it needs one.
+
+ The COOKIE environment variable contains all cookies set in the current
+ request.  This has the same format as the HTTP_COOKIES ("key=val;key=val")
+ passed to a CGI program.  This should be used with caution.  Cookies come
+ from the user's computer and might have been created, editted or deleted
+ by the user rather than your website.  This severely limits their use for
+ authentication.  It is not possible to set cookies from an authentication
+ module.
+
+ The URI variable is there because various people want it.  Mostly it
+ is useful not for authentication ("who is this person?") but for access
+ control ("is this person permitted to do this?"), and good design usually
+ dictates separating those functions.  Strictly speaking, an authenticator
+ is not the right place to be doing access control.  However,
+ mod_authnz_external is 50% a kludge-builder's tool, so we won't fuss if you
+ want to break the rules.

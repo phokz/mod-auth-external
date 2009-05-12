@@ -1,0 +1,105 @@
+How to upgrade from mod_auth_external to mod_authnz_external:
+
+(0)  Read the section entitled "Authn / Authz" in the README file.  This will
+     probably make understanding this new version of the module easier.
+
+(1)  Make sure mod_auth_external is no longer being loaded.  You cannot load
+     both mod_auth_external and mod_authnz_external without problems.  This
+     means ensuring that there is no "LoadModule" or "AddModule" line for
+     mod_auth_external.  You could also remove the mod_auth_external.so file
+     from the Apache 'modules' directory.
+
+(2)  Install mod_authnz_external as described in the INSTALL file.
+
+(3)  The server-level configuration directives in the httpd.conf file are the
+     same as before.  There has been no change to the way "AddExternalAuth",
+     "AddExternalGroup", "AddExternalAuthMethod", and "AddExternalGroupMethod"
+     work.
+
+(4)  In the per-directory configurations (either in .htaccess files or in a
+     <Directory> block in httpd.conf) need to include a new directive to tell
+     mod_auth_basic to use mod_authnz_external for authentication.  For
+     mod_auth_external, the per-directory configurations normally looked
+     something this:
+
+	AuthType Basic
+        AuthName <authname>
+        AuthExternal <keyword>
+	require valid-user
+
+     For mod_authnz_external, you need to add the "AuthBasicProvider" directive.
+
+	AuthType Basic
+        AuthName <authname>
+	AuthBasicProvider external
+        AuthExternal <keyword>
+	require valid-user
+
+     The directive "AuthType Basic" tells apache that you want to use the
+     mod_auth_basic module to do "basic authentiation".  The directive
+     "AuthBasicProvider external" tells mod_auth_basic to use
+     mod_authnz_external to check the correctness of passwords.
+
+     Note that the "AuthBasicProvider" directive is only needed if you are
+     using mod_authnz_external for password checking.  If you are using it
+     only for group checking, then this is not needed.
+
+(5)  If you were using mod_auth_external in a non-authoritative mode, then
+     your per-directory configuration probably included the directive:
+
+        AuthExternalAuthoritative off
+
+     This command will no longer work.  Instead you should use one or both
+     of the following commands:
+
+        AuthBasicAuthoritative off
+        GroupExternalAuthoritative off
+
+     The "AuthBasicAuthoritative" directive effects password checking, which
+     is done through mod_auth_basic.
+
+     The "GroupExternalAuthoritative" effects only group checking.  That is
+     if you had both "GroupExternal" directive setting up an external program
+     for group checking, and an "AuthGroupFile" directive setting up a group
+     file, then it would control whether the first module to process a
+     "Require group admin" directive was the only one to run, or whether each
+     group checker was given a chance to decide if the user was in that group
+     based on it's group database.
+
+(6)  If you were using multiple Require directives, the behavior may change
+     under Apache 2.2.  Suppose you wanted to allow access to user "pete" and
+     members of the group "admins".  You might have do:
+
+        Require group admin
+	Require user pete
+
+     Under Apache 2.0, both of these directives would have been checked by
+     mod_auth_external, and it would have correctly allowed access if either
+     of the two conditions were satisfied.  In Apache 2.2, however, only
+     "Require group" and "Require file-group" directives are checked by
+     mod_authnz_external.  "Require user" and "Require valid-user" are checked
+     by mod_authz_user, a standard module that comes with Apache.  How the
+     two directives interact depends on whether they are authoritative or
+     not.  mod_authz_user is Authoritative by default, so to get the old
+     behavior, you will need to do
+
+        GroupUserAuthoritative off
+
+(7)  Note that a new type of functionality is available under Apache 2.2 with
+     mod_authnz_external.  Thanks to mod_authz_owner, you can now do:
+
+         Require file-owner
+     or
+         Require file-group
+
+     The first checks if the name of the authenticated user matches the
+     name of the unix account that owns the file.  The second checks if,
+     according to whatever group database has been configured for the 
+     current directory, the currently authenticated user is in a group
+     with the same name as the Unix group that owns the file.
+     
+     Normally these are rather strange directives, because normally unix
+     accounts have no relationship to accounts in whatever database is
+     being used for http authentication, but for people using 'pwauth'
+     with mod_authnz_external, these really check if the user has been
+     authenticated as the unix user who owns the file.

@@ -10,7 +10,7 @@ Edit "`mod_authnz_external.c`"
 
 === Step 2: ===
 
-Uncomment the _HARDCODE_ #define.
+Uncomment the `_HARDCODE_` #define.
 
 === Step 3: ===
 

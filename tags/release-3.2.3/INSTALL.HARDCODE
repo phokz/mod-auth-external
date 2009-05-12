@@ -1,0 +1,76 @@
+If you want to use mod_authnz_external.c with a hardcoded internal function,
+then you first have to hardcode an internal function (who wudda thunk?).
+-----------------------------------------------------------------------------
+
+Step 1:
+	Edit "mod_authnz_external.c"
+
+Step 2:
+	Uncomment the _HARDCODE_ #define.
+
+Step 3:
+	Uncomment the line:
+              /* #include "your_function_here.c" */
+	Replace "your_function_here.c" with the path/name of your function.
+
+	(Actually, I think it might be better to imbed the function itself
+	directly in this file instead of including it.  Modules work better
+	if they are implemented in a single source file.)
+
+	Your function should start something like:
+
+	  int
+	  function_name (char *user_name,char *user_passwd,char *config_path)
+
+	It should return 0 if the password is correct for the given user,
+	and other values if it is not, pretty much just like external
+	authentication programs do.
+
+	You'll want to code this very carefully.  A crash will crash not just
+	your program but the entire httpd.
+
+	** BIG NOTE TO PROGRAMMERS **
+	-DO NOT- use exit() or other such calls that will cause your
+	function to exit abnormally or dump core. It will take the entire 
+	httpd with it and display a message to your browser saying "no data". 
+	Use "return" instead of exit().
+
+Step 4:
+	Choose a <function name> for your function. ie: 'RADIUS' or 'SYBASE'
+	This will be used for telling mod_authnz_external which hard coded
+	function you want to call.
+
+Step 5:
+	Find the exec_hardcode() function inside mod_authnz_external.c.
+	Find the big commented section there.  Replace the example call
+	to example() with a call to your function.  Also change the name
+	"EXAMPLE" to the name you chose for your function.
+
+	The function call in exec_hardcode() should look something like:
+
+        if (strcmp(check_type,"<function name>")==0) {
+            code = function_name(c->user,sent_pw,config_file);
+        }
+
+	Here, we replace "<function_name>" with the name you chose in step 4.
+	function_name(), of course, should be whatever you called your function
+	in step 3.
+
+Step 6:
+	Save your work.  Also save some whales.
+
+Step 7:
+	Compile and configure mod_authnz_external as described in the
+	INSTALL file.
+
+	The AddExternalAuth command in your httpd.conf file might look
+	something like
+
+	    AddExternalAuth whatever EXAMPLE:/usr/local/data/configfile
+
+	Here 'whatever' is the name you will use to invoke this authenticator
+	in the AuthExternal commands in your .htaccess files.  'EXAMPLE'
+	is the name you choose in step 4 and inserted into the "if" statement
+	in step 5.  Any data after the colon will be passed into your function.
+	It might be a config file path or something else.
+

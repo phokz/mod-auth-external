@@ -1,0 +1,18 @@
+Jan Wolter:
+
+ - Look into developing a "socket" method, in which we first try open a
+   socket connecting to the external authenticator, and only launch a new one
+   if the initial connection attempt fails.  This would avoid launching a
+   new authenticator for each hit.  Instead the authenticator would be a
+   persistant process that can hold open a connection to the database and
+   even do caching of recent authentications.
+
+ - Improve Windows support.  Theoretically version 3.2.0 should work on
+   windows, but I don't do windows development and can't test it or
+   document installation procedures.
+
+ - I think the apache data structure r->subprocess_env is a table into which
+   various modules place environment variable definitions that they want to
+   have passed into CGI programs, for example, mod_ssl puts HTTPS and a
+   bunch of other variables here.  Should I load all of them into the
+   environment for the external authenticator?  Needs study.

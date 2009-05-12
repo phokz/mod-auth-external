@@ -10,6 +10,7 @@
 Several small dummy external authentication programs written in Perl. These are meant only for testing of `mod_auth*_external`. They accept any user whose password exactly matches his login name. They write lots of debugging info to the error_log file.
 
 *Author and Maintainer*: [http://www.unixpapa.com/white.cgi Jan Wolter]
+
 </dd>
 
 <dt>`auth-mysql`</dt>
@@ -28,9 +29,9 @@ A external authenticator for authenticating out of a MySQL database. Written in 
 A Radius client using code from the publicly available Merit Radius source code. *Unmaintained.*
 
 *Author*: Tyler Allison (allison@nas.nasa.gov)
+
 </dd>
 
-<dl>
 <dt>`sybase`</dt>
 <dd>
 A function that queries a sybase database and compares the passwords for said user.

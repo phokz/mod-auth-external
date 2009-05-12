@@ -1,0 +1,17 @@
+The MySQL auth program is by Anders Nordby <anders@fix.no> who maintains it
+at http://anders.fix.no/software/#unix
+
+See the header of the auth-mysql.pl file for the author's notes.
+
+This require the Perl DBI/DBD libraries for mysql:
+  http://cpan.valueclick.com/modules/by-category/07_Database_Interfaces/DBI/
+  http://cpan.valueclick.com/modules/by-category/07_Database_Interfaces/DBD/
+
+Configuration is mostly by editing the definitions at the front of the
+mysql-auth.pl.
+
+In the likely event that your SQL tables have different field names, you'll
+also have to edit the SQL query in the call to $dbh->prepare().
+
+If you want to use a database server other than MySQL, you'll need the DBD
+library for that database and you'll need to change the DBI->connect() call.

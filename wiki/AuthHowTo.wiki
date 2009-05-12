@@ -51,7 +51,7 @@ A value of 0 indicates that the password is correct.  Other values indicate
 that the password is incorrect, or something else is wrong.  It can be
 useful to return different numeric error codes for different kinds of errors.  These
 will be logged in the Apache error log file, and can be helpful in diagnosing
-problems.  'Mod_auth*_external' does not have any provision for
+problems.  `Mod_auth*_external` does not have any provision for
 returning textual error messages from the external authenticator.  You might
 be able to use syslog() for this.  This might be improved in future releases.
 

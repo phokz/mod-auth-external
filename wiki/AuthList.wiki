@@ -1,0 +1,81 @@
+#summary Available Authenticators
+
+`Mod_auth_external` is, of course, useless unless it has an external authenticator to run. There are some examples of authenticators included in the distribution, and several useful ones are available separately.
+
+== Example External Authenticators in Distribution ==
+
+<dl>
+<dt>`test`</dt>
+<dd>
+Several small dummy external authentication programs written in Perl. These are meant only for testing of `mod_auth*_external`. They accept any user whose password exactly matches his login name. They write lots of debugging info to the error_log file.
+
+*Author and Maintainer*: [http://www.unixpapa.com/white.cgi Jan Wolter]
+</dd>
+
+<dt>`auth-mysql`</dt>
+<dd>
+A external authenticator for authenticating out of a MySQL database. Written in Perl using the DBI/DBD library, so it is easily adapted to any other SQL server.
+
+*Author and Maintainer*: [http://anders.fix.no/software/#unix Anders Nordby]
+</dd>
+</dl>
+
+== Example Internal Authenticators in Distribution ==
+
+<dl>
+<dt>`radius`</dt>
+<dd>
+A Radius client using code from the publicly available Merit Radius source code. *Unmaintained.*
+
+*Author*: Tyler Allison (allison@nas.nasa.gov)
+</dd>
+
+<dl>
+<dt>`sybase`</dt>
+<dd>
+A function that queries a sybase database and compares the passwords for said user.
+*Unmaintained.*
+
+*Author*: br@ota.fr.socgen.com
+</dd>
+</dl>
+
+== Authentication Modules Available Separately ==
+
+`Mod_auth*_external` can be used either with authenticators specifically written for it or with [http://cr.yp.to/checkpwd.html checkpassword] authenticators.  This is not a [http://www.qmail.org/top.html#checkpassword complete list] of `checkpassword` authenticators, but I'll include a few here.
+
+<dl>
+<dt>`pwauth`</dt>
+<dd>
+A setuid-root external authentication program for securely authenticating out of most flavors of Unix shadow password files, or via PAM. Combined with 'pam_smb', this supports NT-style SMB authentication. Supports some Unix lastlog and faillog options.
+
+*Available From:* http://code.google.com/p/pwauth/
+
+*Author and Maintainer*: [http://www.unixpapa.com/white.cgi Jan Wolter]
+</dd>
+
+<dt>`checkpassword-pam`</dt>
+<dd>
+Another way to authenticate via PAM.
+
+*Available From:* http://checkpasswd-pam.sourceforge.net/
+
+*Author:* Alexey Mahotkin alexm@hsys.msk.ru
+</dd>
+
+<dt>`checkpassword-ldap`</dt>
+<dd>
+An LDAP authenticator.
+
+*Available From:* http://freshmeat.net/projects/checkpassword-ldap/
+</dd>
+
+<dt>`radcheckpassword`</dt>
+<dd>
+Checking against external Radius server(s).
+
+*Available From:* http://free.acrconsulting.co.uk/email/radcpw.html
+
+*Author:* Andrew Richards
+</dd>
+</dl>

@@ -318,5 +318,3 @@ A status code of -2 (or 254) indicates that the authenticator crashed or was kil
  * Error log says "Failed (X) for user foo" with X being some number other than 255 or -1.
 
 The authenticator ran, and exited with the given non-zero return code.  You'll have to check the authenticator to see under what conditions it exits with that return code.
-
-*THIS PAGE IS INCOMPLETE *

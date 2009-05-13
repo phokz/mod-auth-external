@@ -19,22 +19,11 @@ as a privileged user and handles privileged data.  A poorly written
 authenticator could substantially compromise the security of your system.
 You get points for paranoia.  Some notes:
 
-  * Don't make any assumptions about the length of the login names and
-    passwords given by the user.  I _think_ Apache will never pass you ones
-    that are longer than 8192 characters, but don't depend this.  Check very
-    carefully for buffer overflows.
+  * Don't make any assumptions about the length of the login names and passwords given by the user.  I _think_ Apache will never pass you ones that are longer than 8192 characters, but don't depend this.  Check very carefully for buffer overflows.
 
-  * Think about locking.  It is possible to get lots of hits at your website
-    very fast, so there may be many programs simultaneously reading your
-    authentication database, plus updates may be going on at the same time.
-    Probably some form of locking is needed to make all this work right.
+  * Think about locking.  It is possible to get lots of hits at your website very fast, so there may be many programs simultaneously reading your authentication database, plus updates may be going on at the same time. Probably some form of locking is needed to make all this work right.
 
-  * If you are programming in C, think about core dumps.  On some systems core dump
-    files can be publicly
-    readable.  A core dump from your authenticator is likely to contain the
-    user's plain text password, and may include large chunks of your password
-    database that may have been in buffers.  For C programs on most versions of
-    Unix, it is possible to disable core dumps by doing something like:
+  * If you are programming in C, think about core dumps.  On some systems core dump files can be publicly readable.  A core dump from your authenticator is likely to contain the user's plain text password, and may include large chunks of your password database that may have been in buffers.  For C programs on most versions of Unix, it is possible to disable core dumps by doing something like:
     {{{
        rlim.rlim_cur = rlim.rlim_max = 0;
        (void)setrlimit(RLIMIT_CORE, &rlim);

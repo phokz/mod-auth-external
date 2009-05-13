@@ -13,8 +13,7 @@ Here are some relevant links.  See also the [AuthList list of available external
 Jonathan Weiss's blog entry describing [http://blog.innerewut.de/2007/6/26/apache-2-2-authentication-with-mod_authnz_external how to install mod_authnz_external and pwauth]. Might be a useful reference.
 </li>
 
-<li>
-  [http://sourceforge.net/projects/mod-auth-shadow/ mod_auth_shadow], by Bruce Duggan, appears to be a re-implementation of the same basic concept for authenticating out of shadow password file.  I haven't checked it out enough to decide if it has any advantages over using `pwauth` with `mod_auth_external`. On first inspection it appears to be slightly less portable and paranoid.
+<li> [http://sourceforge.net/projects/mod-auth-shadow/ mod_auth_shadow], by Bruce Duggan, appears to be a re-implementation of the same basic concept for authenticating out of shadow password file.  I haven't checked it out enough to decide if it has any advantages over using `pwauth` with `mod_auth_external`. On first inspection it appears to be slightly less portable and paranoid.
 </li>
 
 <li>[http://linux.wareseeker.com/Internet/mod-auth-pipe-1.0.zip/319312 mod_auth_pipe] is Alvaro Gamez Machado's development from `mod_auth_shadow`, allowing it to run arbitrary authenticators.  The result ends up doing pretty much the same thing as 'mod_auth_external'.

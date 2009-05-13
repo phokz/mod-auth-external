@@ -47,7 +47,8 @@ First you need to turn `mod_authz_unixgroup` on for the directory:
 {{{
 AuthzUnixgroup on
 }}}
-Next you'll need a required directive like
+
+Next you'll need a require directive like
 {{{
 Require group admin
 }}}

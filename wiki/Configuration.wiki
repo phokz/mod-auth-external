@@ -24,7 +24,7 @@ instructions to your server configuration.
 This step is not required if you are using static loading.  Even if you are doing dynamic loading, `apxs` should have set up everything correctly for you.  If you are trustful, you can skip ahead to step 2 and only come back to this if things don't seem to be working.  In cases where you are using multiple non-authoritative authenticators you'll probably want to check this manually, even if apxs works right, to ensure that the modules are loaded (and thus envoked) in the desired order.
 
 <ol>
-<li>First, you should make sure that there is a proper "`LoadModule`" command in the httpd.conf file.  This should have been put there by '`apxs`' but, some older Linux distributions, like Redhat 6.1, messed it up.  Basically, the 'LoadModule' command should look a lot like all the other LoadModule commands you'll find there.  Something like
+<li>First, you should make sure that there is a proper "`LoadModule`" command in the httpd.conf file.  This should have been put there by '`apxs`' but, some older Linux distributions, like Redhat 6.1, messed it up.  Basically, the 'LoadModule' command should look a lot like all the other `LoadModule` commands you'll find there.  Something like
 {{{
 LoadModule authnz_external_module modules/mod_authnz_external.so
 }}}
@@ -163,4 +163,160 @@ DefineExternalGroup archive_group environment /usr/local/bin/grpcheck
 }}}
 
 == 3. Configuring Web Pages to Use Authentication ==
+
+For any directory you want to protect, you need either a `.htaccess` file in the directory or a `<Directory>` block for the directory in your `httpd.conf` file.
+
+Note that for `.htaccess` files to work, you must specify "`AllowOverride AuthConfig`" in the `httpd.conf` file for any directories they appear under.  As distributed, Apache sets "`AllowOverride None`" for most directories.  If this is not changed, `.htaccess` files will be ignored.
+
+=== 3.1. External Password Authenticators ===
+
+For normal user authentication, the following directives should be in the `.htaccess` file or `<Directory>` block:
+{{{
+AuthType Basic
+AuthName <authname>
+AuthBasicProvider external
+AuthExternal <keyword>
+Require valid-user
+}}}
+
+Here `<authname>` identifies what we are authenticating for - it usually appears in the browser's pop-up login window.  `<keyword>` matches a keyword you defined with `DefineExternalAuth` or `AddExternalAuth` in step 2.
+
+If you only want some users to have access to the directory, as opposed to all valid users, you can list the users on the "`require`" line, changing it to:
+{{{
+Require user <username1> <username2> ...
+}}}
+Or if you have mod_authz_owner installed and you want to allow only user's whose login name matches the login name of the unix user who owns the file being accessed, you can say:
+{{{
+Require file-owner
+}}}
+
+=== 3.2.  External Group Checkers ===
+
+If you want to use the external group check program to allow only users in a given group to have access, you could do:
+{{{
+AuthType Basic
+AuthName <authname>
+AuthBasicProvider external
+AuthExternal <keyword>
+GroupExternal <groupkeyword>
+Require group <groupname1> <groupname2> ...
+}}}
+
+Here `<groupkeyword>` matches a name you defined with with the `DefineExternalGroup` or `AddExternalGroup` command in step 2.
+
+Normally if you have multiple group names on your "`Require group`" command, then the group checker will be run only once, passing it the whole space-separated list of groups.  Some older group checking programs may only be able to handle one group name at a time.  So if you want the group checker to be run once for each group name, you can add the directive:
+{{{
+GroupExternalManyAtOnce off
+}}}
+
+If, instead of listing group names, you want to allow access only to users whose group name (as determined by whatever group database your external group checker uses) matches the unix group name that owns the file being accessed, you can configure an external group checker, install `mod_authz_owner` and then do:
+{{{
+Require file-group
+}}}
+
+=== 3.3. Passing Context Information into Authenticators ===
+
+If you want the authentication to work slightly differently in different directories, then you can add a directive like:
+{{{
+AuthExternalContext <context>
+}}}
+This will simply pass whatever `<context>` string you entered to the authenticator in an environment variable called `CONTEXT`.  The authenticator can use that to modify it's behavior.
+
+=== 3.4. Modifying Error Codes for Group Checking ===
+
+Normally, if a group authentication fails, then `mod_authnz_external` will return a 401 error, which will normally cause the browser to pop up a fresh login box so the user can try logging in with a different ID.  This may not always be appropriate.  If you rejected him because he has a blocked IP address, returning a 403 error, which displays an error page (which you can configure) may be a better choice.  To get a 403 error instead of a 401 error on failed group access checks, you would add the following command to your configuration:
+{{{
+GroupExternalError 403
+}}}
+This would effect only group checks, never password checks.  Bad passwords always result in a 401 error.
+
+=== 3.5. Interactions with Other Authenticators ===
+
+It is possible to configure more than one different authentication module.  If you do so, you will normally want to make them unauthoritative, so that if one fails, the others will be tried. That way, authentication or access will be granted if ANY of the the configured modules finds it valid.
+
+If all your password checkers are "`authn`" modules running under `mod_auth_basic`, then you need do nothing.  The arbitration among such modules is different than the arbitration between top level modules, and does the right thing by default.  But if some are not "`authn`" modules, then you'll want to make `mod_auth_basic` unauthoritative with the "`AuthBasicAuthoritative off`" directive described in the Apache manual.
+
+If you have multiple group checkers, then you will need to make `mod_authnz_external` un-authoritative for group checking.  To do this, use the directive:
+{{{
+GroupExternalAuthoritative off
+}}}
+Of course, you'll probably also have to make the other module unauthoritative.  For example, if you have a "`Require user pete`" directive and a "`Require group admin`" directive and expect it to allow either `pete` or any `admin` to login, then you need to make `mod_authz_user` unauthoritative, because that's what checks "`Require user`" directives.
+
+See the Apache manual pages on `AuthType`, `AuthName`, `AuthBasicProvider`, `Require`, and `AuthGroupFile` for more information.
+
+=== 3.6. Old Directives ===
+
+Some of the directives mentioned above used to have different names. The old names still work for backward compatibility.
+
+        `AuthzExternalAuthoritative`    equals   `GroupExternalAuthoritative`
+
+        `AuthExternalGroupsAtOnce`      equals   `GroupExternalManyAtOnce`
+
+== 4. Install the Authenticator ==
+
+Install your external authentication program in the location named by the pathname on your `AddExternalAuth` directive.
+
+Make sure everything is permitted so that whatever account the `httpd` runs under can execute the authenticator.  Typically this requires 'execute' access to the script and all the directories above it.  If it is a script, then read access to the script will also be needed.
+
+If your script is an set-uid script, then make sure the file is owned by the user it is supposed to run as, and that the suid-bit is set.
+
+== 5. Restart Apache ==
+
+Restart Apache, so that all the new configuration commands will be loaded.  If you have the `apachectl` command do:
+{{{
+apachectl restart
+}}}
+For some systems which doesn't have `apachectl`, you'll want to manually run the startup script for apache.  The locations of these vary somewhat in different Unix systems, but they typically are something like this:
+{{{
+/etc/init.d/httpd restart
+}}}
+
+== 6. Test It ==
+
+Test your changes/code by trying to view a protected page.
+
+If it doesn't work, check the apache error logs.  They are loaded with helpful information.  Some common problems and their usual causes:
+
+ * Miscellaneous odd behaviors.
+
+ Did you restart the httpd after the last time you edited the  httpd.conf file or recompiled Apache?  Confirm that an  "Apache configured -- resuming normal operations" message appeared  in the error log when you restarted.
+
+ * Apache complains about not recognizing `mod_authnz_external` commands in the `httpd.conf` file like "`DefineExternalAuth`" and "`AddExternalAuth`".
+
+ Either the module didn't get installed (if you staticly linked the module, are you running the newly compiled copy of `httpd`?), or it isn't enabled (if it is dynamically linked, the `AddModule` and `LoadModule` commands described above in step (1) may be missing, incorrect, or commented out by an inappropriate `<IfDefine>`).
+
+ Sometimes I've found that the `httpd.conf` file I've been editing is not actually the one being used by the copy of Apache that is running.  Sometimes I test this by inserting deliberately invalid commands and checking to see if error messages are generated when Apache is restarted.
+
+ * It displays pages in a protected directory without asking for a login and password.
+
+ For some reason Apache is not seeing the directory configuration commands that set up authentication for that directory.  If you are using `.htaccess` files, does your `httpd.conf` file say "`AllowOverride AuthConfig`" for the directory?  Apache is usually distributed with "`AllowOverride None`" set, which will cause `.htaccess` files to be quietly ignored
+
+ * All logins are rejected, and the error log says it cannot execute the authentication module.  Error messages might look like:
+{{{
+exec of '/foo/bar/authcheck' failed: (2) No such file or directory
+[Thu Nov 15 12:26:43 2007] [error] AuthExtern authcheck
+   [/foo/bar/authcheck]: Failed (-1) for user foo
+[Thu Nov 15 12:26:43 2007] [error] user foo: authentication
+   failure for /mae/index.html": Password Mismatch
+}}}
+
+ The first of these three messages is from Apache's process launching library, and gives the clearest information about what caused the error.  Typically it will be either "No such file", which means that the pathname you specified for the authenticator in step (2) does not match the actual location of your external authenticator, or it will be "permission denied", indicating that either the file or one of the directories above it is permitted so whatever account apache is configured to run as does not have execute permission. If it's a script, it also needs read opinion.
+
+ The second error message is actually generated by mod_auth_external.  It just says authentication failed for the user.  Normally it would give the status code returned by the authenticator in parenthesis, but if the authenticator could not be executed it will show a phoney status code of -1 (which some systems display as 255).
+
+ The third error message is from Apache.  Don't be mislead by it's saying "Password Mismatch".  When `mod_auth_external` fails, it rejects all access attempts.  To apache this looks like a password mismatch.
+
+ * Authentications failed and the message in the error log says it failed with a status code of -2 or 254, for example:
+{{{
+[Thu Nov 15 12:26:43 2007] [error] AuthExtern authcheck
+   [/foo/bar/authcheck]: Failed (-2) for user foo
+[Thu Nov 15 12:26:43 2007] [error] user foo: authentication
+   failure for /mae/index.html": Password Mismatch
+}}}
+A status code of -2 (or 254) indicates that the authenticator crashed or was killed before it could return a status code.  This could either be because some other process sent it a signal to terminate it, or it crashed due to some kind internal error in the code, causing a segmentation fault or some other similar crash.
+
+ * Error log says "Failed (X) for user foo" with X being some number other than 255 or -1.
+
+The authenticator ran, and exited with the given non-zero return code.  You'll have to check the authenticator to see under what conditions it exits with that return code.
+
 *THIS PAGE IS INCOMPLETE *

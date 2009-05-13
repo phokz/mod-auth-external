@@ -23,24 +23,25 @@ instructions to your server configuration.
 
 This step is not required if you are using static loading.  Even if you are doing dynamic loading, `apxs` should have set up everything correctly for you.  If you are trustful, you can skip ahead to step 2 and only come back to this if things don't seem to be working.  In cases where you are using multiple non-authoritative authenticators you'll probably want to check this manually, even if apxs works right, to ensure that the modules are loaded (and thus envoked) in the desired order.
 
- # First, you should make sure that there is a proper "`LoadModule`" command in the httpd.conf file.  This should have been put there by '`apxs`' but, some older Linux distributions, like Redhat 6.1, messed it up.  Basically, the 'LoadModule' command should look a lot like all the other LoadModule commands you'll find there.  Something like
+<ol>
+<li>First, you should make sure that there is a proper "`LoadModule`" command in the httpd.conf file.  This should have been put there by '`apxs`' but, some older Linux distributions, like Redhat 6.1, messed it up.  Basically, the 'LoadModule' command should look a lot like all the other LoadModule commands you'll find there.  Something like
 {{{
 LoadModule authnz_external_module modules/mod_authnz_external.so
 }}}
- where the second part is the path from Apache's root directory to the location where the module was stored by `apxs`.
+where the second part is the path from Apache's root directory to the location where the module was stored by `apxs`.
 
-  Make sure that apxs didn't put this directive inside any inappropriate `<IfDefine>` directives, as some Redhat versions have done in the past.
+Make sure that apxs didn't put this directive inside any inappropriate `<IfDefine>` directives, as some Redhat versions have done in the past.
 
- If you previously had `mod_authnz_external` or `mod_auth_external` installed and are installing a new version, you may have more than one LoadModule command in `httpd.conf`.  You only need one.  Get rid of the old ones.
+If you previously had `mod_authnz_external` or `mod_auth_external` installed and are installing a new version, you may have more than one LoadModule command in `httpd.conf`.  You only need one.  Get rid of the old ones.
 
- # Check you `httpd.conf` file to see if there is a "`ClearModuleList`" command.  If this exists, then you need to add a command like:
+<li>Check you `httpd.conf` file to see if there is a "`ClearModuleList`" command.  If this exists, then you need to add a command like:
 {{{
 AddModule mod_authnz_external.c
 }}}
- somewhere below "ClearModuleList" command (probably somewhere among dozens of other AddModule commands).  If you used 'apxs' to install mod_authnz_external, then this should already be done, but it may again be stashed in an inappropriate `<IfDefine>`.
+somewhere below "ClearModuleList" command (probably somewhere among dozens of other AddModule commands).  If you used 'apxs' to install mod_authnz_external, then this should already be done, but it may again be stashed in an inappropriate `<IfDefine>`.
 
- The standard Apache configuration files don't have a "`ClearModuleList`" command and don't need an "`AddModule`" command.  However the standard RedHat configuration files, among others, do.
-
+The standard Apache configuration files don't have a "`ClearModuleList`" command and don't need an "`AddModule`" command.  However the standard RedHat configuration files, among others, do.
+</ol>
 
 == 2.  Configuring the External Authenticator ==
 
@@ -83,7 +84,7 @@ SetExternalAuthMethod <keyword> <method>
 
  * *For "pipe", "environment", and "checkpassword" methods:* `<location>` is the full path where you installed your external authentication program, like "`/usr/local/bin/auth_check`". It always starts with a slash.  If you put it in quotes, you can include command-line arguments, but these arguments won't be processed by a shell, so you can't use wildcards or I/O redirects or anything like that.  (If you need shell processing of arguments, write an sh-script wrapper for your authenticator, and put the path to that here.)
 
- * *For the "function" method:* <location> is a string like "`<type>:<data>`".  The `<type>` part is a string that can be used to select from multiple internal functions.  `<data>` is a string passed to that function and is typically used as config file path.  The "`:`" is required even if the `<data>` is an empty string.
+ * *For the "function" method:* `<location>` is a string like "`<type>:<data>`".  The `<type>` part is a string that can be used to select from multiple internal functions.  `<data>` is a string passed to that function and is typically used as config file path.  The "`:`" is required even if the `<data>` is an empty string.
 
 In the old-style syntax, the path declaration should always preceed the method declaration, and the method declaration can be omitted if you want the default.
 

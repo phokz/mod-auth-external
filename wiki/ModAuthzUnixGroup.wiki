@@ -1,0 +1,35 @@
+#summary Apache Unix Group Access Control Module
+
+== Introduction: ==
+
+`Mod_Authz_Unixgroup` is a unix group access control module for Apache 2.1 and later. If you are having users authenticate with real Unix login ID over the net, using something like my [http://code.google.com/p/mod-auth-external mod_authnz_external] / [http://code.google.com/p/pwauth pwauth\] combination, and you want to do access control based on unix group membership, then `mod_authz_unixgroup` is exactly what you need.
+
+Let's say you are doing unix passwd file authentication with `mod_authnz_external` and `pwauth`. Your `.htaccess` file for a protected directory would probably start with the following directives:
+{{{
+AuthType Basic
+AuthName mysite
+AuthBasicProvider external
+AuthExternal pwauth
+}}}
+That would cause `mod_auth_basic` and `mod_authnz_external` to do authentication based on the Unix `passwd` database. `Mod_Authz_Unixgroup` would come into play if you wanted to further restrict access to specific Unix groups. You might append the following directives:
+{{{
+AuthzUnixgroup on
+Require group staff admin
+}}}
+This would allow only access to accounts in the '`staff`' or '`admin`' unix groups. You can alternately specify groups by their gid numbers instead of their names.
+
+Though it makes the most sense to use `mod_authz_unixgroup` with unix passwd authentication, it can be used with other databases. In that case it would grant access if, (1) the name the user authenticated with exactly matched the name of a real unix account on the server, and (2) that real unix account was in one of the required groups. However, I think this would be a pretty senseless way to use this module. I expect that it will really only be used by users of `mod_authnz_external` and `pwauth` or other similar software.
+
+Some authentication modules, like `mod_auth_kerb`, use usernames that have domains appended to them, like "`whomever@krb.ncsu.edu`". In such cases, `mod_authz_unixgroup` will take the part before the `@`-sign as the username and ignore the rest.
+
+It will come as no surprise that this module works only on Unix systems. It should work on pretty much any vaguely modern Unix.
+
+== Use with mod_authz_owner: ==
+
+You could use `mod_authz_unixgroup` together with the standard apache module `mod_authz_owner` to do something like:
+{{{
+Require file-group
+}}}
+This would allow access to the page only if the user was a member of whichever unix group owns the file.
+
+Note however, that when access is denied, either because the file does not exist or because the user is not in the group that owns the file, then the normal response will be for the browser to flush it's cached login and password for the authentication realm, and give the user a new login prompt. The user will have to re-login to access other files in the realm that they do have access to. This may be clumsy in some applications, where it would be much nicer to display a "permission denied" error message and not flush the user's credentials. I don't know of a fix for this though. HTTP authentication realms are kind of designed with the assumption that you have access to everything in the realm or nothing and `mod_authz_owner` kind of subverts that. 

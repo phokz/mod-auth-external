@@ -44,7 +44,7 @@ A function that queries a sybase database and compares the passwords for said us
 
 == Authentication Modules Available Separately ==
 
-`Mod_auth*_external` can be used either with authenticators specifically written for it or with [http://cr.yp.to/checkpwd.html checkpassword] authenticators.  This is not a [http://www.qmail.org/top.html#checkpassword complete list] of `checkpassword` authenticators, but I'll include a few here.
+`Mod_auth*_external` can be used either with authenticators specifically written for it or with [http://cr.yp.to/checkpwd.html checkpassword] authenticators.  This is not a [http://www.qmailwiki.org/index.php/Qmail-checkpassword complete list] of `checkpassword` authenticators, but I'll include a few here.
 
 <dl>
 <dt>`pwauth`</dt>
@@ -54,6 +54,15 @@ A setuid-root external authentication program for securely authenticating out of
 *Available From:* http://code.google.com/p/pwauth/
 
 *Author and Maintainer*: [http://www.unixpapa.com/white.cgi Jan Wolter]
+</dd>
+
+<dt>`checkpassworm`</dt>
+<dd>
+The original checkpassword program authenticates from the Unix system password file, like pwauth.
+
+*Available From:* http://cr.yp.to/checkpwd/install.html
+
+*Author:* D. J. Bernstein
 </dd>
 
 <dt>`checkpassword-pam`</dt>

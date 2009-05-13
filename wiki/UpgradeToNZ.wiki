@@ -25,7 +25,7 @@ AuthExternal <keyword>
 require valid-user
 }}}
 
-For mod_authnz_external, you need to add the "AuthBasicProvider" directive.
+For mod_authnz_external, you need to add the "`AuthBasicProvider`" directive.
 {{{
 AuthType Basic
 AuthName <authname>
@@ -36,7 +36,7 @@ require valid-user
 
 The directive "`AuthType Basic`" tells Apache that you want to use the `mod_auth_basic` module to do "basic authentiation".  The directive "`AuthBasicProvider external`" tells `mod_auth_basic` to use `mod_authnz_external` to check the correctness of passwords.
 
-Note that the "AuthBasicProvider" directive is only needed if you are using `mod_authnz_external` for password checking.  If you are using it only for group checking, then this is not needed.
+Note that the "`AuthBasicProvider`" directive is only needed if you are using `mod_authnz_external` for password checking.  If you are using it only for group checking, then this is not needed.
 </li>
 
 <li>

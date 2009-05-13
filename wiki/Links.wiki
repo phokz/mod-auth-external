@@ -10,8 +10,7 @@ Here are some relevant links.  See also the [AuthList list of available external
 </li>
 
 <li>
-  Jonathan Weiss's blog entry describing
-[http://blog.innerewut.de/2007/6/26/apache-2-2-authentication-with-mod_authnz_external how to install mod_authnz_external and pwauth]. Might be a useful reference.
+Jonathan Weiss's blog entry describing [http://blog.innerewut.de/2007/6/26/apache-2-2-authentication-with-mod_authnz_external how to install mod_authnz_external and pwauth]. Might be a useful reference.
 </li>
 
 <li>

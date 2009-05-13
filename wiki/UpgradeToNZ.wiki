@@ -51,7 +51,7 @@ AuthBasicAuthoritative off
 GroupExternalAuthoritative off
 }}}
 
-The "AuthBasicAuthoritative" directive effects password checking, which is done through `mod_auth_basic`.
+The "`AuthBasicAuthoritativ`e" directive effects password checking, which is done through `mod_auth_basic`.
 
 The "`GroupExternalAuthoritative`" effects only group checking.  That is if you had both "`GroupExternal`" directive setting up an external program for group checking, and an "`AuthGroupFile`" directive setting up a group file, then it would control whether the first module to process a "`Require group admin`" directive was the only one to run, or whether each group checker was given a chance to decide if the user was in that group based on it's group database.
 </li>

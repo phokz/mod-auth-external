@@ -16,6 +16,9 @@ Jonathan Weiss's blog entry describing [http://blog.innerewut.de/2007/6/26/apach
 <li>Gatis Špats describes using mod_auth_external 2.2 to authenticate from a MS SQL 2000 server and gives source code for a Javascript authenticator on [http://www.howtoforge.com/apache2_authentication_mssql2000 HowToForge].  The installation instructions are a bit obsolete, but the Java authenticator would likely work as well as ever.
 </li>
 
+<li>Someone posted [http://en.gentoo-wiki.com/wiki/Apache2/mod_authnz_external installation instructions on the Gentoo Wiki].  This includes an incorrect statement that there is a bug in `pwauth` which can be fixed by changing a `getuid()` call to a `geteuid()` call.  Making that change actually disables one of `pwauth`'s security features and should not be done.
+</li>
+
 <li> [http://sourceforge.net/projects/mod-auth-shadow/ mod_auth_shadow], by Bruce Duggan, appears to be a re-implementation of the same basic concept for authenticating out of shadow password file.  I haven't checked it out enough to decide if it has any advantages over using `pwauth` with `mod_auth_external`. On first inspection it appears to be slightly less portable and paranoid.
 </li>
 

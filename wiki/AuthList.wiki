@@ -56,7 +56,16 @@ A setuid-root external authentication program for securely authenticating out of
 *Author and Maintainer*: [http://www.unixpapa.com/white.cgi Jan Wolter]
 </dd>
 
-<dt>`checkpassworm`</dt>
+<dt>`vcheck`</dt>
+<dd>
+An external authenticator by Anders Brander for use against a vpopmail user database.
+
+*Available From:* http://anders.brander.dk/stuff/workings/vcheck/
+
+*Author and Maintainer*: Anders Brander
+</dd>
+
+<dt>`checkpassword`</dt>
 <dd>
 The original checkpassword program authenticates from the Unix system password file, like pwauth.
 

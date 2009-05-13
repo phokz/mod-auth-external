@@ -32,15 +32,16 @@ where the second part is the path from Apache's root directory to the location w
 
 Make sure that apxs didn't put this directive inside any inappropriate `<IfDefine>` directives, as some Redhat versions have done in the past.
 
-If you previously had `mod_authnz_external` or `mod_auth_external` installed and are installing a new version, you may have more than one LoadModule command in `httpd.conf`.  You only need one.  Get rid of the old ones.
-
+If you previously had `mod_authnz_external` or `mod_auth_external` installed and are installing a new version, you may have more than one `LoadModule` command in `httpd.conf`.  You only need one.  Get rid of the old ones.
+</li>
 <li>Check you `httpd.conf` file to see if there is a "`ClearModuleList`" command.  If this exists, then you need to add a command like:
 {{{
 AddModule mod_authnz_external.c
 }}}
 somewhere below "ClearModuleList" command (probably somewhere among dozens of other AddModule commands).  If you used 'apxs' to install mod_authnz_external, then this should already be done, but it may again be stashed in an inappropriate `<IfDefine>`.
 
-The standard Apache configuration files don't have a "`ClearModuleList`" command and don't need an "`AddModule`" command.  However the standard RedHat configuration files, among others, do.
+The standard Apache configuration files don't have a "`ClearModuleList`" command and don't need an "`AddModule`" command.  However the standard Redhat configuration files, among others, do.
+</li>
 </ol>
 
 == 2.  Configuring the External Authenticator ==

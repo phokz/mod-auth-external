@@ -18,7 +18,7 @@ At this point I'm not quite ready to do this.  The benefits aren't that great, a
 {{{
 DefineExternalAuth <keyword> server <hostname>:<portnumber>
 }}}
-When an authentication was needed, `mod_authnz_external` would open a socket connection to the given host and port.  If `<hostname>` was "`localhost'" and we were running on a Unix system it would do a UNIX socket.  It would write the login name and password to the socket, and the authenticator would check them and write back either "OK" or an error message which `mod_authnz_external` would log.
+When an authentication was needed, `mod_authnz_external` would open a socket connection to the given host and port.  If `<hostname>` was "`localhost`" and we were running on a Unix system it would do a UNIX socket.  It would write the login name and password to the socket, and the authenticator would check them and write back either "OK" or an error message which `mod_authnz_external` would log.
 
 There are obvious performance advantages to this.  Establishing a socket connection is probably faster than launching a new process.  Plus the authenticator can do things like maintaining persistent database connections and caching recent authentications that can further improve it's performance.  Plus it opens up the possibility of having the authenticator running on a different server than the HTTP daemon.
 

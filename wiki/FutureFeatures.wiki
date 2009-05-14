@@ -14,7 +14,7 @@ At this point I'm not quite ready to do this.  The benefits aren't that great, a
 
 == Authentication Daemons ==
 
-`Mod_authnz_external` currently works by running the authenticator each time an authentication is needed.  You might get better performance if the authenticator were a persistent daemon to `mod_authnz_external` made socket connections each time an authentication was needed.  Probably we'd define the authenticator with a command like:
+`Mod_authnz_external` currently works by running the authenticator each time an authentication is needed.  You might get better performance if the authenticator were a persistent daemon to which `mod_authnz_external` made socket connections each time an authentication was needed.  Probably we'd define the authenticator with a command like:
 {{{
 DefineExternalAuth <keyword> server <hostname>:<portnumber>
 }}}

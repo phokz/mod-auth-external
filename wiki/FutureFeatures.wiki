@@ -32,7 +32,7 @@ DefineExternalAuth <keyword> daemon <portnumber>:<pathname>
 }}}
 Unlike the "`server`" option, this would always have the daemon running on localhost, with the given port number.  If it fails to respond, then it would run the program at the given pathname, wait a few seconds, and try again to make a socket connection.
 
-The daemon would have to be built with the usual restart logic, where upon start up it checks if a copy is already running, kills that if it exists, and then starts serving.  So again the complexity of the authenticator goes up again.
+The daemon would have to be built with the usual restart logic, where upon start up it checks if a copy is already running, kills that if it exists, and then starts serving.  So again the complexity of the authenticator goes up.
 
 None of this would be terribly hard to build into `mod_authnz_external`.  There are already hooks in the `exec_external()` function that would make it able to launch daemons.  I'd need to research to see which kind of socket management can be done through the Apache API, since I'd prefer not to make this Unix dependent.  One of the biggest questions would be the protocol used to communicate over the socket to the authenticator.  Many protocols exist that include authentication.  Could we do something compatible with one of those that would allow us to use some existing daemons with this?
 

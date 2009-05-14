@@ -53,4 +53,8 @@ Jonathan Weiss's blog entry describing [http://blog.innerewut.de/2007/6/26/apach
 
 <li>Instructions on [http://moinmo.in/HowTo/Setup Moin with WSGI Apache HTTPAuth how to set up the MoinMoin Wiki Engine with mod_authnz_external] including a sample authenticator writting in ruby.
 </li>
+
+<li>Notes on [http://www.d90.us/toolbox/2008/11/03/configuring-authnz_external-and-pwauth/ configuring authnz_external and pwauth] which looks like it might be for Redhat Linux.
+</li>
+
 </ul>

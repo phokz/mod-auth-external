@@ -75,6 +75,7 @@ In the "pipe" method, the arguments are read from standard input.  The user name
            exit(0);     /* Good Password */
       else
            exit(1);     /* Incorrect Password */
+  }
 }}}
 
 Here we simply read two lines from stdin, being careful not to allow buffer overflows and stripping off trailing newlines.

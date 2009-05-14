@@ -36,7 +36,7 @@ The daemon would have to be built with the usual restart logic, where upon start
 
 None of this would be terribly hard to build into `mod_authnz_external`.  There are already hooks in the `exec_external()` function that would make it able to launch daemons.  I'd need to research to see which kind of socket management can be done through the Apache API, since I'd prefer not to make this Unix dependent.  One of the biggest questions would be the protocol used to communicate over the socket to the authenticator.  Many protocols exist that include authentication.  Could we do something compatible with one of those that would allow us to use some existing daemons with this?
 
-But I think that before I under took this I'd want to have someone who serious wanted this feature and was willing to invest some time on testing and development.  I don't have a production server where this would make sense, and if I construct it as a pure theoretical exercise, then I'm afraid it might turn out unusable in practice.
+But I think that before I under took this I'd want to have someone who seriously wanted this feature and was willing to invest some time on testing and development.  I don't have a production server where this would make sense, and if I construct it as a pure theoretical exercise, then I'm afraid it might turn out unusable in practice.
 
 Actually, I'm afraid of that in any case.  Good, stable, scalable server programs are hard to write, and without one an authentication system built on this would tend to be fragile.  I think the existing method of starting up a fresh authenticator for each request may well be better for most applications.
 

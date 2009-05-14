@@ -1,22 +1,14 @@
-#summary Links to Related Software
+#summary Useful Links
 
 Here are some relevant links.  See also the [AuthList list of available external authenticators]:
+
+== Other Software ==
 
 <ul>
 <li>[http://httpd.apache.org/ Apache HTTP Server].  Can't run `mod_auth_anything` without it.
 </li>
 
-<li>[http://code.google.com/p/pwauth/ pwauth external authenticator]. Used with `mod_auth*_external` for authenicating out of a unix password database or via PAM.
-</li>
-
-<li>
-Jonathan Weiss's blog entry describing [http://blog.innerewut.de/2007/6/26/apache-2-2-authentication-with-mod_authnz_external how to install mod_authnz_external and pwauth]. Might be a useful reference.
-</li>
-
-<li>Gatis Špats describes using mod_auth_external 2.2 to authenticate from a MS SQL 2000 server and gives source code for a Javascript authenticator on [http://www.howtoforge.com/apache2_authentication_mssql2000 HowToForge].  The installation instructions are a bit obsolete, but the Java authenticator would likely work as well as ever.
-</li>
-
-<li>Someone posted `mod_authnz_external` and `pwauth` [http://en.gentoo-wiki.com/wiki/Apache2/mod_authnz_external installation instructions on the Gentoo Wiki].  This includes an incorrect statement that there is a bug in `pwauth` which can be fixed by changing a `getuid()` call to a `geteuid()` call.  Making that change actually disables one of `pwauth`'s security features and should not be done.
+<li>[http://code.google.com/p/pwauth/ pwauth external authenticator]. Used with `mod_auth*_external` for authenticating out of a unix password database or via PAM.
 </li>
 
 <li> [http://sourceforge.net/projects/mod-auth-shadow/ mod_auth_shadow], by Bruce Duggan, appears to be a re-implementation of the same basic concept for authenticating out of shadow password file.  I haven't checked it out enough to decide if it has any advantages over using `pwauth` with `mod_auth_external`. On first inspection it appears to be slightly less portable and paranoid.
@@ -38,10 +30,27 @@ The <a href="http://www.kernel.org/pub/linux/libs/pam/modules.html">list of PAM 
 <li>[http://pam.sourceforge.net/mod_auth_pam/ mod_auth_pam]. If you want to use a PAM module to authenticate, and whatever user Apache runs as has the necessary access to do the check, then you don't need an external authenticator, and you should probably use this module instead of `mod_auth*_external` and `pwauth`.  There is such a thing as mod_auth_pam2, which is supposed to work with Apache2.
 </li>
 
-
 <li>[http://www.carc.musc.edu/webNIS/mod_auth_any.html mod_auth_any]. This seems to be similar in function to `mod_auth*_external`. It seems very sparsely documented at this stage, but it from  looking at the source code it seems to pass the login/password to the external authenticator on the command line, which doesn't seem very secure since they'd be trivially visible to anyone doing a 'ps'.
 </li>
 
 <li>[http://modules.apache.org/ Apache Module Registry]. A good place to find apache modules.
+</li>
+</ul>
+
+== How To Pages ==
+
+<ul>
+
+<li>
+Jonathan Weiss's blog entry describing [http://blog.innerewut.de/2007/6/26/apache-2-2-authentication-with-mod_authnz_external how to install mod_authnz_external and pwauth]. Might be a useful reference.
+</li>
+
+<li>Gatis Špats describes using mod_auth_external 2.2 to authenticate from a MS SQL 2000 server and gives source code for a Javascript authenticator on [http://www.howtoforge.com/apache2_authentication_mssql2000 HowToForge].  The installation instructions are a bit obsolete, but the Java authenticator would likely work as well as ever.
+</li>
+
+<li>Someone posted `mod_authnz_external` and `pwauth` [http://en.gentoo-wiki.com/wiki/Apache2/mod_authnz_external installation instructions on the Gentoo Wiki].  This includes an incorrect statement that there is a bug in `pwauth` which can be fixed by changing a `getuid()` call to a `geteuid()` call.  Making that change actually disables one of `pwauth`'s security features and should not be done.
+</li>
+
+<li>Instructions on [http://moinmo.in/HowTo/Setup Moin with WSGI Apache HTTPAuth how to set up the MoinMoin Wiki Engine with mod_authnz_external] including a sample authenticator writting in ruby.
 </li>
 </ul>

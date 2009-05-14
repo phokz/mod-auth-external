@@ -2,7 +2,7 @@
 
 == 1. Languages ==
 
-External authenticators can be written in almost any language.  The sample
+External authenticators can be written in almost any language.  I've seen examples in C, Perl, Python, Java, Ruby and sh.  The sample
 authenticators in the 'test' directory are in Perl.  The 'pwauth'
 authenticator is in ANSI C.  The example code fragments in this document
 are in C.
@@ -19,7 +19,7 @@ as a privileged user and handles privileged data.  A poorly written
 authenticator could substantially compromise the security of your system.
 You get points for paranoia.  Some notes:
 
-  * Don't make any assumptions about the length of the login names and passwords given by the user.  I _think_ Apache will never pass you ones that are longer than 8192 characters, but don't depend this.  Check very carefully for buffer overflows.
+  * Don't make any assumptions about the length of the login names and passwords given by the user.  I _think_ Apache will never pass you ones that are longer than 8192 characters, but don't depend this.  C programmers should check very carefully for buffer overflows.
 
   * Think about locking.  It is possible to get lots of hits at your website very fast, so there may be many programs simultaneously reading your authentication database, plus updates may be going on at the same time. Probably some form of locking is needed to make all this work right.
 
@@ -46,6 +46,8 @@ be able to use syslog() for this.  This might be improved in future releases.
 
 Returned error codes should not be negative.  Negative values are used
 internally to 'mod_authnz_external' to indicate problems launching your program.
+
+Messages written to standard error will go into the Apache error log.  This can be useful for error logging and debugging.  You should not write out the password in any production configuration.
 
 How the external authentication program gets its arguments depends on
 the method used.  The method used is determined by the '`SetExternalAuthMethod`'

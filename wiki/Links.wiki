@@ -42,7 +42,7 @@ The <a href="http://www.kernel.org/pub/linux/libs/pam/modules.html">list of PAM 
 <ul>
 
 <li>
-Jonathan Weiss's blog entry describing [http://blog.innerewut.de/2007/6/26/apache-2-2-authentication-with-mod_authnz_external how to install mod_authnz_external and pwauth]. Might be a useful reference.
+Jonathan Weiss's blog entry describing [http://blog.innerewut.de/2007/6/26/apache-2-2-authentication-with-mod_authnz_external how to install mod_authnz_external and pwauth] on FreeBSD. Might be a useful reference.
 </li>
 
 <li>Gatis Špats describes using mod_auth_external 2.2 to authenticate from a MS SQL 2000 server and gives source code for a Javascript authenticator on [http://www.howtoforge.com/apache2_authentication_mssql2000 HowToForge].  The installation instructions are a bit obsolete, but the Java authenticator would likely work as well as ever.

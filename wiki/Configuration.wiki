@@ -183,7 +183,7 @@ Require valid-user
 
 Here `<authname>` identifies what we are authenticating for - it usually appears in the browser's pop-up login window.  `<keyword>` matches a keyword you defined with `DefineExternalAuth` or `AddExternalAuth` in step 2.
 
-<font color="green">
+<font color="blue">
 *The following feature will be in the next release and is currently in trunk:*
 
 It is possible to list more than one authenticator on the `AuthExternal` command:

@@ -1,5 +1,7 @@
 #summary Configuring Mod_Auth_External
 
+<wiki:toc max_depth="3" />
+
 There are three parts to doing the configuration.  First, if you are using
 dynamic loading, you need to configure Apache to load the `mod_authnz_external`
 module.  If '`apxs`' is working correctly, it should do this for you
@@ -181,6 +183,16 @@ Require valid-user
 
 Here `<authname>` identifies what we are authenticating for - it usually appears in the browser's pop-up login window.  `<keyword>` matches a keyword you defined with `DefineExternalAuth` or `AddExternalAuth` in step 2.
 
+<font color="green">
+*The following feature will be in the next release and is currently in trunk*:
+
+It is possible to list more than one authenticator on the AuthExternal command:
+{{{
+AuthExternal <keyword1> <keyword2>...
+}}}
+Here each keyword should match an authenticator defined with the `DefineExternalAuth` command.  If the first authenticator fails, then the second one will be run, and so on, until either one authenticator accepts the user's login/password combination or all reject it.
+</font>
+
 If you only want some users to have access to the directory, as opposed to all valid users, you can list the users on the "`require`" line, changing it to:
 {{{
 Require user <username1> <username2> ...
@@ -189,7 +201,6 @@ Or if you have mod_authz_owner installed and you want to allow only user's whose
 {{{
 Require file-owner
 }}}
-
 === 3.2.  External Group Checkers ===
 
 If you want to use the external group check program to allow only users in a given group to have access, you could do:

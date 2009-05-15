@@ -1,0 +1,61 @@
+                       Mod_Authz_Unixgroup version 1.0.1
+
+              Author:  Jan Wolter
+	     Website:  http://www.unixpapa.com/mod_authz_unixgroup/
+	    Requires:  Apache 2.1 or later on a Unix server
+
+Mod_Authz_Unixgroup is a unix group access control modules for Apache 2.1 and
+later.  If you are having users authenticate with real Unix login ID over the
+net, using something like my mod_authnz_external/pwauth combination, and you
+want to do access control based on unix group membership, then
+mod_authz_unixgroup is exactly what you need.
+
+Let's say that you were using this with mod_authnz_external and pwauth.  Your
+.htaccess file for a protected directory would probably start with the
+following directives:
+
+    AuthType Basic
+    AuthName mysite
+    AuthBasicProvider external
+    AuthExternal pwauth
+
+That would cause mod_auth_basic and mod_authnz_external to do authentication
+based on the Unix passwd database.  Mod_Authz_Unixgroup would come into play
+if you wanted to further restrict access to specific Unix groups.  You might
+append the following directives:
+
+    AuthzUnixgroup on
+    Require group staff admin
+
+This would allow only access to accounts in the 'staff' or 'admin' unix groups.
+You can alternately specify groups by their gid numbers instead of their names.
+
+Or you could use mod_authz_unixgroup together with the standard apache module
+mod_authz_owner to do something like:
+
+    Require file-group
+
+This would allow access to the page, only the user was a member of the unix
+group that owns the file.
+
+Though it makes the most sense to use this with unix passwd authentication,
+it can be used with other databases.  In that case it would grant access if,
+(1) the name the user authenticated with exactly matched the name of a real
+unix account on the server, and (2) that real unix account was in one of the
+required groups.  However, I think this would be a pretty senseless way to
+use this module.  I expect that it will really only be used by user of
+mod_authnz_external/pwauth.
+
+Some authentication modules, like mod_auth_kerb, use usernames that have
+domains appended to them, like "whomever@krb.ncsu.edu".  In such cases,
+mod_authz_unixgroup will take the part before the @-sign as the username
+and ignore the rest.
+
+Mod_authnz_external is available from:
+   http://www.unixpapa.com/mod_auth_external/
+
+Pwauth is available from:
+   http://www.unixpapa.com/pwauth/
+
+It might also be possible to use this with mod_auth_shadow, expecially if a
+authn/authz version of that is ever released.

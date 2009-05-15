@@ -1,3 +1,5 @@
+/* Copyright 2008 Jan Wolter - See LICENSE and NOTICE */
+
 #include "apr_lib.h"
 
 #include "ap_config.h"

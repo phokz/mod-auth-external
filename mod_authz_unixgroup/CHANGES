@@ -1,3 +1,7 @@
+v1.0.2   (Jan Wolter - not yet released)
+------------------------------------
+ * Adding copyright and Apache Version 2.0 license
+
 v1.0.1   (Jan Wolter - Aug 6, 2008)
 ------------------------------------
  * Delete various logging statements that were really just there for

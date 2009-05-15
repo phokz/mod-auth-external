@@ -115,7 +115,7 @@ module AP_MODULE_DECLARE_DATA authnz_external_module;
 
 typedef struct
 {
-    char *auth_name;		 /* Auth keyword for current dir */
+    apr_array_header_t *auth_name; /* Auth keyword for current dir */
     char *group_name;		 /* Group keyword for current dir */
     char *context;		 /* Context string from AuthExternalContext */
     int  authoritative;		 /* Are we authoritative in current dir? */
@@ -148,7 +148,7 @@ static void *create_authnz_external_dir_config(apr_pool_t *p, char *d)
     authnz_external_dir_config_rec *dir= (authnz_external_dir_config_rec *)
 	apr_palloc(p, sizeof(authnz_external_dir_config_rec));
 
-    dir->auth_name= NULL;	/* no default */
+    dir->auth_name= apr_array_make(p,2,sizeof(const char *));	/* no default */
     dir->group_name= NULL;	/* no default */
     dir->context= NULL;		/* no default */
     dir->authoritative= 1;	/* strong by default */
@@ -281,6 +281,19 @@ static const char *set_extgroup_method(cmd_parms *cmd, void *dummy,
     return NULL;
 }
 
+/* Append an argument to an array defined by the offset */
+static const char *append_array_slot(cmd_parms *cmd, void *struct_ptr,
+				const char *arg)
+{
+    int offset = (int)(long)cmd->info;
+    apr_array_header_t *array=
+    	*(apr_array_header_t **)((char *)struct_ptr + offset);
+
+    *(const char **)apr_array_push(array)= apr_pstrdup(array->pool, arg);
+
+    return NULL;
+}
+
 
 /*
  * Config file commands that this module can handle
@@ -288,11 +301,11 @@ static const char *set_extgroup_method(cmd_parms *cmd, void *dummy,
 
 static const command_rec authnz_external_cmds[] =
 {
-    AP_INIT_TAKE1("AuthExternal",
-	ap_set_string_slot,
+    AP_INIT_ITERATE("AuthExternal",
+	append_array_slot,
 	(void *)APR_OFFSETOF(authnz_external_dir_config_rec,auth_name),
 	OR_AUTHCFG,
-	"a keyword indicating which authenticator to use"),
+	"one (or more) keywords indicating which authenticators to use"),
 
     AP_INIT_TAKE3("DefineExternalAuth",
 	def_extauth,
@@ -722,47 +735,53 @@ static int authz_external_check_user_access(request_rec *r)
 static authn_status authn_external_check_password(request_rec *r,
 	const char *user, const char *password)
 {
-    const char *extpath, *extmethod;
+    const char *extname, *extpath, *extmethod;
+    int i;
     authnz_external_dir_config_rec *dir= (authnz_external_dir_config_rec *)
 	    ap_get_module_config(r->per_dir_config, &authnz_external_module);
 
     authnz_external_svr_config_rec *svr= (authnz_external_svr_config_rec *)
 	    ap_get_module_config(r->server->module_config,
 		&authnz_external_module);
-    const char *extname= dir->auth_name;
     int code= 1;
 
     /* Check if we are supposed to handle this authentication */
-    if ( extname == NULL )
+    if (dir->auth_name->nelts == 0)
     {
 	ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
 	    "No AuthExternal name has been set");
 	return AUTH_GENERAL_ERROR;
     }
 
-    /* Get the path associated with that external */
-    if (!(extpath= apr_table_get(svr->auth_path, extname)))
+    for (i= 0; i < dir->auth_name->nelts; i++)
     {
+	extname= ((const char **)dir->auth_name->elts)[i];
+
+	/* Get the path associated with that external */
+	if (!(extpath= apr_table_get(svr->auth_path, extname)))
+	{
+	    ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
+		"Invalid AuthExternal keyword (%s)", extname);
+	    return AUTH_GENERAL_ERROR;
+	}
+
+	/* Do the authentication, by the requested method */
+	extmethod= apr_table_get(svr->auth_method, extname);
+	if ( extmethod && !strcasecmp(extmethod, "function") )
+	    code= exec_hardcode(r, extpath, password);
+	else
+	    code= exec_external(extpath, extmethod, r, ENV_PASS, password);
+
+	/* If return code was zero, authentication succeeded */
+	if (code == 0) return AUTH_GRANTED;
+
+	/* Log a failed authentication */
+	errno= 0;
 	ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
-	    "Invalid AuthExternal keyword (%s)", extname);
-	return AUTH_GENERAL_ERROR;
+	    "AuthExtern %s [%s]: Failed (%d) for user %s",
+	    extname, extpath, code, r->user);
     }
-
-    /* Do the authentication, by the requested method */
-    extmethod= apr_table_get(svr->auth_method, extname);
-    if ( extmethod && !strcasecmp(extmethod, "function") )
-	code= exec_hardcode(r, extpath, password);
-    else
-    	code= exec_external(extpath, extmethod, r, ENV_PASS, password);
-
-    /* If return code was zero, authentication succeeded */
-    if (code == 0) return AUTH_GRANTED;
-
-    /* Otherwise it failed */
-    errno= 0;
-    ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
-    	"AuthExtern %s [%s]: Failed (%d) for user %s",
-	extname, extpath, code, r->user);
+    /* If no authenticators succeed, refuse authentication */
     return AUTH_DENIED;
 }
 

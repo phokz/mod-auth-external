@@ -402,7 +402,7 @@ instructions to your server configuration.
 	Require valid-user
 
     Here <authname> identifies what we are authenticating for - it usually
-    appears in the browser's pop-up login windown.  <keyword> matches a
+    appears in the browser's pop-up login window.  <keyword> matches a
     keyword you defined with DefineExternalAuth or AddExternalAuth in step 2.
 
     If you only want some users to have access to the directory, as opposed
@@ -416,6 +416,16 @@ instructions to your server configuration.
     can say (assuming you have mod_authz_owner installed):
 
 	Require file-owner
+
+    It is possible to list more than one authenticator on the AuthExternal
+    command:
+
+        AuthExternal <keyword1> <keyword2>...
+
+    Here each keyword should match an authenticator defined with the
+    DefineExternalAuth command.  If the first authenticator fails, then
+    the second one will be run, and so on, until either one authenticator
+    accepts the user's login/password combination or all reject it.
 
     * EXTERNAL GROUP CHECKING:
 
@@ -448,6 +458,9 @@ instructions to your server configuration.
     checker and then install mod_authz_owner and do:
 
         Require file-group
+
+    The GroupExternal cannot (yet?) be used with multiple external
+    authenticators.
 
     * PASSING CONTEXT INFORMATION INTO AUTHENTICATORS:
 
@@ -551,7 +564,7 @@ instructions to your server configuration.
 
       - Miscellaneous odd behaviors.
 
-	Did you restart the httpd after the last time you editted the
+	Did you restart the httpd after the last time you edited the
 	httpd.conf file or recompiled Apache?  Confirm that an
 	"Apache configured -- resuming normal operations" message appeared
 	in the error log when you restarted.

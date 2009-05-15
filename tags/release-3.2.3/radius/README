@@ -1,7 +1,0 @@
-This is a hardcoded internal authentication function for use with
-mod_auth_external or mod_authnz_external.  It supports authenticating
-from a Radius server.
-
-Author:  Tyler Allison <allison@nas.nasa.gov>
-
-This code is no longer being maintained.

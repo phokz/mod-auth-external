@@ -50,4 +50,4 @@ The cache could simply be kept in Apache's memory, but there are typically many 
 
 There seems to be a [http://www.muquit.com/muquit/software/mod_auth_ldap/mod_auth_ldap_cache.html caching option for mod_auth_ldap] that uses a dbm file.  Might be worth looking at that as an example.
 
-Apache 2.4 will have a ap_socache.h header that defines a new distributed cache interface. Should check if that is going to be useful.
+Apache 2.4 will have a ap_socache.h header that defines a new distributed small-obje4ct cache interface. Should check if that is going to be useful.

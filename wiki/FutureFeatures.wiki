@@ -46,8 +46,8 @@ If you have a user logged onto your system, then you need to re-authenticate him
 
 Actually, this shouldn't be part of `mod_authnz_external` but should be a separate module. There is already a [http://mod-auth-cache.sourceforge.net/ mod_auth_cache] but it appears to cache the login data in a cookie, where it can readily be manipulated by the user.  This is completely unacceptable.  The cache needs to be on the server side.
 
-The cache could simply be kept in Apache's memory, but there are typically many copies of Apache running, and ideally you'd like the cache to be shared across them all.  Possibly a dbm file or shared memory could be used.  If you were using a disk cache, you'd probably do something like take an MD5 checksum of login/password, and use that as a key into the dbm file, with the last access time as the value.  With a stored memory solution you could probably skip the encryption.
+The cache could simply be kept in Apache's memory, but there are typically many copies of Apache running, and ideally you'd like the cache to be shared across them all.  Possibly a dbm file or shared memory could be used.  If you were using a disk cache, you'd probably do something like take an MD5 checksum of login/password/domain, and use that as a key into the dbm file, with the last access time as the value.  With a stored memory solution you could probably skip the encryption.
 
 There seems to be a [http://www.muquit.com/muquit/software/mod_auth_ldap/mod_auth_ldap_cache.html caching option for mod_auth_ldap] that uses a dbm file.  Might be worth looking at that as an example.
 
-Apache 2.4 will have a ap_socache.h header that defines a new distributed small-obje4ct cache interface. Should check if that is going to be useful.
+Apache 2.4 will have a [http://svn.apache.org/repos/asf/httpd/httpd/trunk/include/ap_socache.h ap_socache.h] interface that defines a new distributed small-object cache interface. Should check if that is going to be useful.

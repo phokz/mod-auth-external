@@ -1,10 +1,13 @@
 v3.2.4   (Jan Wolter - May 15, 2009)
 -----------------------------------------------
+ * Dropped the radius code from the distribution, because of possible problems
+   with it's license.
  * Modified AuthExternal directive to be able to take more than one
    authenticator name.  If more than one is defined, then each authenticator
    is run in turn, until one succeeds or all have failed.  Probably a similar
    change should be made to GroupExternal, but it hasn't been done yet because
    it's a more complex change and nobody has asked for it.
+ * Clean-up of handling of return codes from apr_proc_wait().
 
 v3.2.3   (Jan Wolter - Feb 26, 2009)
 -----------------------------------------------

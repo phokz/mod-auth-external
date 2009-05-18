@@ -413,13 +413,15 @@ static void extchilderr(apr_pool_t *p, apr_status_t err, const char *desc)
  * a detached daemon, run this with extmethod=NULL.
  *
  * If the authenticator was run, we return the numeric code from the
- * authenticator, normally 0 for if the log was valid, some small positive
+ * authenticator, normally 0 if the login was valid, some small positive
  * number if not.  If we were not able to run the authenticator, we log
  * an error message and return a numeric error code:
  *
  *   -1   Could not execute authenticator, usually a path or permission problem
  *   -2   The external authenticator crashed or was killed.
  *   -3   Could not create process attribute structure
+ *   -4   apr_proc_wait() did not return a status code.  Should never happen.
+ *   -5   apr_proc_wait() returned before child finished.  Should never happen.
  */
 
 static int exec_external(const char *extpath, const char *extmethod,
@@ -434,8 +436,8 @@ static int exec_external(const char *extpath, const char *extmethod,
     char *child_env[12];
     char *child_arg[MAX_ARG+2];
     const char *t;
-    int i, status;
-    apr_exit_why_e why;
+    int i, status= -4;
+    apr_exit_why_e why= APR_PROC_EXIT;
 
     /* Set various flags based on the execution method */
 
@@ -564,8 +566,14 @@ static int exec_external(const char *extpath, const char *extmethod,
 	apr_file_close(proc.in);
     }
 
-    apr_proc_wait(&proc, &status, &why, APR_WAIT);
-    if (why != APR_PROC_EXIT)
+    if (!APR_STATUS_IS_CHILD_DONE(apr_proc_wait(&proc,&status,&why,APR_WAIT)))
+    {
+	/* Should never happen */
+    	ap_log_rerror(APLOG_MARK, APLOG_ERR, rc, r,
+		"Error waiting for external authenticator");
+	return -5;
+    }
+    if (!APR_PROC_CHECK_EXIT(why))
     {
 	ap_log_rerror(APLOG_MARK, APLOG_ERR, rc, r,
 		"External authenticator died on signal %d",status);

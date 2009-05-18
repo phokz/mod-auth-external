@@ -202,19 +202,17 @@ available from http://www.unixpapa.com/pwauth/.
 Example Hardcoded Internal Authentication Routines in this Distribution:
 ------------------------------------------------------------------------
 
- radius/
-    A Radius client using code from the publicly available Merit Radius
-    source code.
-
-    Author:  Tyler Allison <allison@nas.nasa.gov>
-    Unmaintained.
-
  sybase/
     A function that queries a sybase database and compares the passwords
     for said user.
 
     Author:  <br@ota.fr.socgen.com>
     Unmaintained.
+
+The radius client previously distributed with mod_auth_external has been
+removed from the distribution because of possible license problems.  Get it
+from http://unixpapa.com/software/mae_radius.tar.gz if you want it, but
+mod_auth_radius is a better choice.
 
 If you have programs or functions you have coded and would like to add them
 to the examples collection on the next release please email them to

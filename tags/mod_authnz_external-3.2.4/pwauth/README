@@ -1,0 +1,3 @@
+The "pwauth" external authenticator is not included in the mod_auth_external
+distribution.  It is now available as a separate package from
+http://www.unixpapa.com/pwauth/.

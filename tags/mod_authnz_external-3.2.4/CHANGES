@@ -1,0 +1,284 @@
+v3.2.4   (Jan Wolter - May 20, 2009)
+-----------------------------------------------
+ * Dropped the radius code from the distribution, because of possible problems
+   with it's license.  Thanks to Hai Zaar for pointing out this problem.
+ * Modified AuthExternal directive to be able to take more than one
+   authenticator name.  If more than one is defined, then each authenticator
+   is run in turn, until one succeeds or all have failed.  Probably a similar
+   change should be made to GroupExternal, but it hasn't been done yet because
+   it's a more complex change and nobody has asked for it.  Thanks to Andreas
+   Ntaflos for suggesting this change.
+ * Inserted code to restore SIGCHLD to default before running the
+   authenticator.  Sometime other modules (like php built with the
+   --enable-sigchild option) leave SIGCHLD messed up, which would cause
+   problems with getting the return code back from authenticators.  We
+   restore SIGCHLD to whatever state it was in originally after the
+   authenticator terminates.  Thanks to Stefan Mehlhorn for reporting this
+   problem and providing the help needed to diagnose it.
+ * Clean-up of handling of return codes from apr_proc_wait() to be more
+   formally correct.
+
+v3.2.3   (Jan Wolter - Feb 26, 2009)
+-----------------------------------------------
+ * Added GroupExternalError directive, which allows you to specify the
+   HTTP error code to be returned if the group access check fails.
+   Defaut is 401, but you may want to return 403 if you want to show the
+   user an error page instead of asking him to login again.  Thanks to
+   Peter Crawshaw <pcrawshaw@mta.ca> for this patch.
+ * In hopes of getting to a more consistantly named set of directives,
+   added new aliases for two old directives:
+      GroupExternalAuthoritative    alias for    AuthzExternalAuthoritative
+      GroupExternalManyAtOnce       alias for    AuthExternalGroupsAtOnce
+   Documentation updated to refer primarily to the new names.
+
+v3.2.2   (Jan Wolter - Dec 1, 2008)
+-----------------------------------------------
+ THIS RELEASE UPDATES DOCUMENTATION ONLY!
+ * Improved documentation of AuthExternalContext directive in the INSTALL
+   file.
+ * Added documentation to the UPGRADE file on interactions between multiple
+   Require directives.
+
+v3.2.1   (Jan Wolter - Jul 31, 2008)
+-----------------------------------------------
+ * Added AuthExternalContext directive, which defines a string that will be
+   passed to the authenticator in the CONTEXT environment variable.  This can
+   be set from the .htaccess file or the <Directory> block to give slightly
+   different behavior from the same authenticator in different directories.
+   Thanks to Olivier Thauvin <nanardon at mandriva dot org> for this patch.
+
+v3.2.0   (Jan Wolter - Jan 7, 2007)
+-----------------------------------------------
+ * Rewrite external authenticator launching code to use Apache's cross-OS
+   process/thread library instead of directly calling Unix functions.
+   Theoretically this should get us much closer to being usable on non-
+   Unix platforms.
+ * Support alternate syntax for configuration, using DefineAuthExternal and
+   DefineAuthGroup commands.
+ * More detailed error logging.
+ * Much cleanup of documentation.
+
+v3.1.0   (Jan Wolter - Feb 17, 2006)
+-----------------------------------------------
+ * New authn/authz version for Apache 2.2.
+ * Renamed from "mod_auth_external" to "mod_authnz_external" to agree
+   with new module naming conventions.
+ * The more secure "pipe" method is now the default, instead of the old
+   insecure "environment" method.
+ * Eliminated "AuthExternalAuthoritative" directive.  Instead use
+   "AuthBasicAuthoritative" for authentication and "AuthzExternalAuthoritative"
+   for access control.
+ * Substantially rewritten to function as an authentication provider for
+   mod_auth_basic instead of a stand-alone authentication module.
+ * Eliminated duplication of documentation inside mod_authnz_external.c file.
+ * Addition of UPGRADE document, and update of all other documentation.
+ * Normalization of many variable names and other clean up of code.
+
+v2.2.10  (Jan Wolter - Sep 29, 2005)
+-----------------------------------------------
+ * Renamed module from "external_auth_module" to "auth_external_module".  This
+   seems to be what is wanted for static linking.
+
+v2.2.9  (Jan Wolter - Sep 25, 2004)
+-----------------------------------------------
+ * Small corrections to 2.0 defines, thanks to Guenter Knauf <gk@gknw.de>.
+ * Pwauth removed from this package.  It is now distributed separately.
+
+v2.2.8  (Jan Wolter - Jun 30, 2004)
+-----------------------------------------------
+ * Trivial documentation improvement.
+ * Clarification of docomentation on use of pwauth options UNIX_LASTLOG,
+   FAILLOG_JFH, and MIN_UNIX_UID with PAM.
+
+v2.2.7  (Jan Wolter - Oct 23, 2003)
+-----------------------------------------------
+ * Pwauth gains IGNORE_CASE and DOMAIN_AWARE options, both aimed at making
+   work more easily for those used to authentication in Microsoft environments.
+   Thanks to Peter Eggimann <egp@zhwin.ch> for these enhancemen
+ * Fix one bit of remaining Apache 1.3 api inside HARDCODE block.
+ * Grammar corrections in AUTHENTICATORS file.
+
+v2.2.6  (Jan Wolter - Aug 14, 2003)
+-----------------------------------------------
+ * Minor improvements to debugging notes in the INSTALL document.
+
+v2.2.5  (Jan Wolter - Jul 11, 2003)
+-----------------------------------------------
+ * Pass local hostname (or virtual hostname) to authenticator in HTTP_HOST
+   environment variable.  Thanks to Steve Horan <sjh-mae@horan.net.au> for
+   submitting this modification.
+
+v2.2.4  (Jan Wolter - Jan 12, 2003)
+-----------------------------------------------
+ * Documentation updates for OpenBSD and minor OpenBSD portability fixes to
+   pwauth.
+
+v2.2.3  (Jan Wolter - Oct 21, 2002)
+-----------------------------------------------
+ * More update of installation instructions.  Thanks to Sven Koch
+   <haegar@sdinet.de> and Joshua Polterock <joshuap@sdsc.edu>.
+
+v2.2.2  (Jan Wolter - Oct 14, 2002)
+-----------------------------------------------
+ * Partial update of installation instructions.
+
+v2.2.1  (Jan Wolter - Jun 24, 2002)
+-----------------------------------------------
+ * Corrected undefined symbol in _HARDCODE_ option.  Thanks to Phil
+   Benchoff <benchoff@vt.edu>.
+
+v2.2.0  (Dave Woolaway, Sven Koch & Jan Wolter - Jun 22, 2002)
+--------------------------------------------------------------
+ * Ported to work with Apache 2.0.28 by Dave Woolaway <dave@watersheep.org>
+ * Independently ported to work with Apache 2.0.39 by Sven Koch
+   <haegar@sdinet.de>
+ * Version merger and insufficient documentation updates by Jan Wolter.
+
+v2.1.15 (Jan Wolter - Jan 22, 2002)
+-----------------------------------
+ * Added MySQL-auth to distribution.  Contributed by Anders Nordby
+   <anders@fix.no>.
+
+v2.1.14 (Jan Wolter - Jan 1, 2002)
+-----------------------------------
+ * Minor clarification to documentation on virtual hosts.
+ * Minor update of description of pwauth in README file.
+ * Correction of AIX compilation instructions.  Thanks to Mathieu Legare
+   <legare@uqtr.ca> for this.
+ * Fixed name of GROUP environment variable in pwauth/unixgroup script.  Thanks
+   to Jeroen Roodnat <jroodnat@xs4all.nl> for pointing this out.
+
+v2.1.13 (Jan Wolter - Jul 31, 2001)
+-----------------------------------
+ * Pass AUTHTYPE environment variable to external authenticator.  This is
+   PASS if we are doing password authentication, GROUP if we are doing group
+   authentication, so the same authentication program can easily be used to
+   do both.  Thanks to Dan Thibadeau <dan_thibadeau@hp.com> for this.
+ * pwauth can now be configured to work for more than one UID.
+ * pwauth/FORM_AUTH updated to discuss suExec.
+
+v2.1.12 (Jan Wolter - Jul 9, 2001)
+-----------------------------------
+ * Fixed erroneous variable names in _HARDCODE_ stuff.  Thanks to Phil
+   Benchoff <benchoff@vt.edu> for this fix.
+ * Added pwauth/unixgroup, a simple perl unix group authenticator.  Hope to
+   replace this with a better solution someday.
+
+v2.1.11 (Jan Wolter - Apr 25, 2001)
+-----------------------------------
+ * Arguments may now be specified for authenticators on the AddAuthExternal
+   command.  The whole command must be in quotes, no shell meta characters
+   may be used, and there is a limit of 32 arguments.
+ * Support for the checkpassword protocol, allowing use of checkpassword
+   compatible authenticators.  Thanks go to Matthew Kirkwood
+   <matthew@dev.sportingbet.com> for submitting patches for this.
+ * Mod_auth_external now passes the URI environment variable to all
+   authenticators, giving the URL of the requested page minus hostname,
+   and CGI arguments.  Thanks to Charles Clancy <mgrtcc@cs.rose-hulman.edu>
+   and Niall Daley <niall@neoworks.com> for independently submitting similar
+   patches for this.
+ * Fixed a possible buffer overflow problem in the HARDCODE section.  This
+   is unlikely to have been an exploitable security problem but could
+   cause a crash in rare circumstances. Thanks go to Bradley S. Huffman
+   <hip@a.cs.okstate.edu> for pointing this out.
+ * Example programs in test directory log command-line arguments.
+
+v2.1.10 (Jan Wolter - Jan 9, 2001)
+----------------------------------
+ * Fix a pwauth bug that could cause segmentation faults when compiled with
+   the ENV_METHOD option.
+ * Add documentation on how to use pwauth for form authentication.
+ * Clarify documentation on configuration for SSL servers.
+
+v2.1.9 (Jan Wolter - Jul 7, 2000)
+----------------------------------
+ * Correct documentation to reflect the fact that Solaris *does* have a ps
+   command that displays environment variables.  Thanks to Piotr Klaban
+   <makler@oryl.man.torun.pl> for pointing this out.
+
+v2.1.8 (Jan Wolter - May 3, 2000)
+----------------------------------
+ * By default, pass all group names at once to group authenticators.  To get
+   old one-group-at-a-time behavior back, use the new directive
+   "AuthExternalGroupsAtOnce off".  This modification contributed by
+   Rudi Heitbaum <rudi@darx.com>.  Thanks.
+
+v2.1.7 (Jan Wolter - Apr 3, 2000)
+----------------------------------
+ * Pass COOKIE environment variable to authenticator with cookies from current
+   request.  Is this a good idea?
+ * Added rather dubious HP-UX support to pwauth.  Untested.
+
+v2.1.6 (Jan Wolter - Mar 23, 2000)
+----------------------------------
+ * Added documentation about installing as a dynamically loaded module.
+ * Added documentation about "AddModule" command for RedHat installs.
+ * Lots of other small documentation improvements.
+
+v2.1.5 (Jan Wolter - Jan  6, 2000)
+----------------------------------
+ * Improved documentation on writing authenticators.
+
+v2.1.4 (Jan Wolter - Jan  4, 2000)
+----------------------------------
+ * Oops, PAM support in v2.1.3 didn't work after all.  Many fixes, including
+   Work-around for Solaris 2.6 appdata_ptr=NULL bug.  Huge thanks again to
+   Peter Arnold <PJArnold@uq.net.au> for help with testing.
+ * Generate compile-time error if Apache version is older than 1.3.1
+ * Better code to get lastlog path for pwauth.
+
+v2.1.3 (Jan Wolter - Dec 17, 1999)
+----------------------------------
+ * AuthExternalAuthoritative directive added.  This code contributed by Mike
+   Burns (burns@cac.psu.edu).
+ * Testing of PAM support in pwauth under Solaris 2.6 by Peter Arnold
+   <PJArnold@uq.net.au>.
+ * Many clarifications to install manual and other documentation.
+
+v2.1.2 beta (Jan Wolter - Jun 28, 1999)
+----------------------------------
+PAM support and minor bug fixes.  PAM support in pwauth is based on code
+contributed by Karyl Stein (xenon313@arbornet.org).  Not been fully tested.
+
+v2.1.1 (Jan Wolter - Mar 10, 1999)
+----------------------------------
+Various small enhancements making better use of Apache API.
+
+ * Better memory management, eliminating all use of fixed sized arrays.
+ * Child process calls ap_cleanup_for_exec() to close any resources (file
+   descriptors, etc) left open in the pools.
+ * Cleanup of error messages.
+
+
+v2.1.0 (Jan Wolter - Mar 5, 1999)
+---------------------------------
+Significant rewrite, rolling in changes from various divergent versions
+and a number of bug fixes, and small enhancements. Changes include:
+
+ * Better checking against overflow of various fixed sized arrays.  (There was
+   already some protection, so there probably wasn't a big security problem
+   here.)
+ * Set environment variables in child process, not parent process.  This
+   prevents them from being inherited by future spawned children.
+ * Check WIFEXITED before acceping WEXITSTATUS.
+ * Elimination of memory leak in strdup() calls.
+ * Check return code from pipe().
+ * Don't close standard output on child process, instead direct it to error
+   log file, just like stderr.
+ * Don't use system() calls.  Instead do direct execl() for faster launch
+   and better security.
+ * In pipe method, the "user=" and "pass=" tags are no longer given on the
+   login and password line.
+ * Pipe method is supported for group authenticators as well as user
+   authenticators.
+ * ip-address and host-name are made available to authenticator in IP and HOST
+   environment variables.
+ * Updated and expanded comments up front.
+
+
+v2.0.1 (Tyler Allison)
+----------------------
+I received a patch update to mod_auth_external v2.0 that supposedly fixes some
+pipe related bugs.  I do not have a program that uses pipes so I can not test
+it myself. I have included the original v2.0 with no patch applied that you
+should use if you run into problems and you DO NOT need pipe support.

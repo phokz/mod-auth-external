@@ -1,0 +1,242 @@
+                   Mod_Authnz_External version 3.2.4
+
+     Original Coder: Nathan Neulinger <nneul@umr.edu>
+Previous Maintainer: Tyler Allison    <allison@nas.nasa.gov>
+ Current Maintainer: Jan Wolter       http://www.unixpapa.com
+    Apache 2.0 Port: Dave Woolaway    <dave@watersheep.org>
+    		     Sven Koch        <haegar@sdinet.de>
+    Apache 2.2 Port: Jan Wolter       http://www.unixpapa.com
+
+Caution:
+--------
+
+Mod_Auth_External can be used to quickly construct secure, reliable
+authentication systems.  It can also be mis-used to quickly open gaping
+holes in your security.  Read the documentation, and use with extreme
+caution.
+
+Versions:
+---------
+
+Mod_authnz_external version 3.2.x is designed for use with Apache version
+2.2.x.  It will not work with Apache 2.0.  If you have an older version of
+Apache, use instead either mod_auth_external-2.1.x for Apache 1.3, or
+mod_auth_external-2.2.x for Apache 2.2.
+
+This module was developed from "mod_auth_external".  It has been restructured
+to fit into the authn/authz structure introduce in Apache 2.1.  It can be used
+in any application where mod_auth_external was previously used.  No changes
+will be needed to the external authentication programs, but the exact Apache
+configuration commands needed will be different.  It is possible to use the
+old "mod_auth_external-2.2" with Apache-2.2, but mod_authnz_external is
+preferable.  If you are upgrading from "mod_auth_external" to
+"mod_authnz_external" then read the file "UPGRADE" for advice.
+
+Introduction:
+-------------
+
+Mod_Authnz_External is an Apache module used for authentication.  The Apache
+HTTP Daemon can be configured to require users to supply logins and passwords
+before accessing pages in some directories.  Authentication is the process
+of checking if the password given is correct for a user.  Apache has
+standard modules for authenticating out of several different kinds of
+databases.  Mod_Authnz_External is a flexible tool for creating authentication
+systems based on other databases.
+
+Mod_Authnz_External can be used in either of two somewhat divergent ways:
+
+ External Authentication:
+
+    When a user supplies a login and password, mod_authnz_external runs a
+    program you write, passing it the login and password.  Your program
+    does whatever checking and logging it needs to, and then returns a
+    Accept/Reject flag to Apache.
+
+    This is slower than doing the authentication internally because it
+    has the overhead of launching an external program for each authentication.
+    However, there are at least two situations where it is very useful:
+
+      - Rapid prototyping.  The external authentication program can be
+        a shell script or perl program.  It can be written without knowing
+        much about building Apache modules.  Bugs in it will not endanger
+        the overall integrity of the Apache server.  Later, as performance
+	becomes more of an issue, you can write a custom Apache module to
+	do the job more efficiently (perhaps using the HARDCODE option below).
+
+      - Access restrictions.  There are situations where you do not want to
+        make your user database readable to the user-id that Apache runs
+        under.  In these cases the external authentication program can be
+        an suid program that has access to databases Apache cannot access.
+        For example, if you want to authentication out of a Unix shadow
+        password database, and you aren't foolish enough to run Apache
+        as root, a carefully written suid-root external authentication
+        program can do the job for you.
+
+    Pwauth, an external authentication program for securely authenticating
+    out of a Unix shadow password database available from
+    http://www.unixpapa.com/pwauth/ .
+
+ Hardcoded Authentication:
+
+    Some hooks have been inserted into mod_authnz_external to make it easy
+    to replace the call to the external authentication program with a
+    call to a hardcoded internal authentication routine that you write.
+
+    This is sort of a half-way measure to just writing your own Apache
+    module from scratch, allowing you to use some of the logic from
+    mod_authnz_external.
+
+    Example functions for authenticating out of a RADIUS server or Sybase
+    database are included in this distribution.
+
+Compatibility:
+--------------
+
+The current version of mod_authnz_external is designed for use with Apache 2.2.
+It will not work with older versions of Apache.
+
+Mod_authnz_external has been tested on a wide variety of Unix platforms.  In
+theory versions after 3.2.0 should work on any non-Unix platforms supported
+by Apache, but it has been tested only under Unix.
+
+Mod_authnz_external is also compatible with authenticators using the
+checkpassword interface.  See http://cr.yp.to/checkpwd.html for more
+information.
+
+Authn / Authz
+-------------
+
+Users of mod_authnz_external may find it helpful understand a bit more of
+it's internal structure.  It is actually best thought of as two functionally
+separate modules, mod_authn_external and mod_authz_external, which have
+combined into a single module simply because they share a lot of code.
+In any particular application, you may only be using one of these two
+modules, or you may be using both.
+
+The mod_authn_external part is an authentication provider for the
+mod_auth_basic module.  Mod_auth_basic handles all the negotiations with
+the browser, while all mod_authn_external does is check if a password
+submitted by the user is correct (which it does by running an external
+program to perform the check).
+
+The mod_authz_external part does access control.  It has no relation
+to mod_auth_basic.  It comes into play after authentication is complete,
+when a "Require group" or "Require file-group" directive is given.  It
+checks if the authenticated user is in the list of required groups (which
+it does by running an external program to perform the check).
+
+Digest Authentication
+---------------------
+
+The new authentication structure introduced in Apache 2.1 makes it much
+easier for modules like this one to support digest authentication as an
+alternative to basic authentication.  Mod_Authnz_External, however, does
+not yet support digest authentication.
+
+I hope to support this in the future, but it really isn't a very attractive
+alternative and I don't expect many people will want to use it.  It will
+not be possible to use the same external authentication programs that are
+used for basic authentication - they would have to be rewritten.  It will
+only work if the database being accessed by the external program either has
+passwords in plaintext, or has them encrypted in a very specific way.  This
+means it could not be used for unix password database authentication or with
+most other password databases not specifically designed for this application.
+And password databases specifically designed for this application might as
+well be designed in a format where they could be accessed by mod_authn_file
+or mod_authn_dbm.
+
+Security Considerations:
+------------------------
+
+By default, mod_authnz_external passes the user's login and password to the
+external authentication program by sending them through a pipe.  This is
+very secure.
+
+In older versions of mod_auth_external, the login and password were by
+default passed in environment variables called USER and PASS.  This is
+still an option, but we do NOT recommend using option.
+
+On some versions of Unix (including SunOS and IRIX) any user logged onto
+the server can see these values by doing a "ps -e" command.  This would
+obviously be a problem if there are ever untrusted users on your server.
+Other versions of Unix (including Linux) restrict "ps -e" so you can only
+see your own processes, but this may still be a problem if untrusted people
+can put CGI programs on your server, since those may run as the same user
+as your authentication program does.  Some versions of Unix don't seem to
+have a "ps -e" command at all, but even then it is best to be careful. 
+Although the default "ps" command on Solaris won't display environment
+variables, the backwards compatible "/usr/ucb/ps" command does.  Are you
+sure there isn't and won't be an old-style ps command installed on your
+system? 
+
+Use of this module requires development of an external authentication program
+or a hardcoded internal function.  These are typically very simple programs,
+but there are more ways to screw up your security by doing them badly than
+we could possibly list.  See the file AUTHENTICATORS for more information
+on implementing authenticators.
+
+Example External Authentication Routines in this Distribution:
+--------------------------------------------------------------
+
+ test/
+    Several small dummy external authentication programs written in Perl.
+    This are meant only for testing of mod_authnz_external.  They accept
+    any user whose password and login name are identical.  They write
+    lots of debugging info to the error_log file.
+
+    Author and Maintainer:  Jan Wolter <janc@cyberspace.org>
+
+ mysql/
+    A Perl program for authenticating out of a MySQL database.  This is
+    written in Perl using the DBI interface, so it could be trivially adapted
+    to work with any other SQL database server that has a DBI interface
+    (that is to say all of them).
+
+    Author and Maintainer:  Anders Nordby <anders@fix.no>
+                            http://anders.fix.no/software/#unix
+
+The "pwauth" authenticator for unix shadow password files or PAM which
+was previously included in this distribution is now in a separate package,
+available from http://www.unixpapa.com/pwauth/.
+
+Example Hardcoded Internal Authentication Routines in this Distribution:
+------------------------------------------------------------------------
+
+ sybase/
+    A function that queries a sybase database and compares the passwords
+    for said user.
+
+    Author:  <br@ota.fr.socgen.com>
+    Unmaintained.
+
+The radius client previously distributed with mod_auth_external has been
+removed from the distribution because of possible license problems.  Get it
+from http://unixpapa.com/software/mae_radius.tar.gz if you want it, but
+mod_auth_radius is a better choice.
+
+If you have programs or functions you have coded and would like to add them
+to the examples collection on the next release please email them to
+jan@unixpapa.com and include a short description.
+
+Checkpassword Authenticators
+----------------------------
+
+There are various "checkpassword" compatible authenticators available on the
+net which can be used with mod_authnz_external.  These authenticators are most
+commonly used with qmail pop servers but it is sometimes useful to be able
+to use the same authentication system for some web pages.  I've listed some
+of the ones that look useful for mod_authnz_external, but I've tested only
+'checkpassword'.
+
+   checkpassword
+	http://cr.yp.to/checkpwd.html
+	Dan J. Bernstein <djb@cr.yp.to>
+
+	Authentication from a Unix shadow password file, similar to the
+	the pwauth program.
+
+   radcheckpassword
+	http://www.tic.ch/e-image/andrew/software/radcheckpassword/
+	Andrew Richards <andrew@tic.ch>
+
+	Radius authentication.

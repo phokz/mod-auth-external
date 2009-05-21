@@ -66,6 +66,7 @@
 #include "ap_config.h"
 #include "ap_provider.h"
 #include "mod_auth.h"
+#include "apr_signal.h"
 
 #define APR_WANT_STRFUNC
 #include "apr_want.h"
@@ -438,6 +439,7 @@ static int exec_external(const char *extpath, const char *extmethod,
     const char *t;
     int i, status= -4;
     apr_exit_why_e why= APR_PROC_EXIT;
+    apr_sigfunc_t *sigchld;
 
     /* Set various flags based on the execution method */
 
@@ -533,6 +535,10 @@ static int exec_external(const char *extpath, const char *extmethod,
 	return -3;
     }
 
+    /* Sometimes other modules wil mess up sigchild.  Need to fix it for
+     * the wait call to work correctly.  */
+    sigchld= apr_signal(SIGCHLD,SIG_DFL);
+
     /* Start the child process */
     rc= apr_proc_create(&proc, child_arg[0],
     	(const char * const *)child_arg,
@@ -566,16 +572,21 @@ static int exec_external(const char *extpath, const char *extmethod,
 	apr_file_close(proc.in);
     }
 
-    if (!APR_STATUS_IS_CHILD_DONE(apr_proc_wait(&proc,&status,&why,APR_WAIT)))
+    /* Wait for the child process to terminate, and get status */
+    rc= apr_proc_wait(&proc,&status,&why,APR_WAIT);
+
+    /* Restore sigchild to whatever it was before we reset it */
+    apr_signal(SIGCHLD,sigchld);
+
+    if (!APR_STATUS_IS_CHILD_DONE(rc))
     {
-	/* Should never happen */
     	ap_log_rerror(APLOG_MARK, APLOG_ERR, rc, r,
-		"Error waiting for external authenticator");
+		"Could not get status from child process");
 	return -5;
     }
     if (!APR_PROC_CHECK_EXIT(why))
     {
-	ap_log_rerror(APLOG_MARK, APLOG_ERR, rc, r,
+	ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
 		"External authenticator died on signal %d",status);
 	return -2;
     }

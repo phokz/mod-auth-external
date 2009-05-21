@@ -136,6 +136,18 @@ we do:
 Then a user will be able to access a file if and only if that file is owned
 by a group of which the user is a member.
 
+Normally, when an access check fails, mod_authz_unixgroup will return a
+HTTP 401 error.  This will typically cause the browser to pop up a message
+saying "Authentication Failed" and then the browser will ask for a new login
+name.  In some cases this is not the desired behavior.  If you are using the
+"Require file-group" directive, you may not want to log the user off every time
+he hits a file he doesn't have access to.  Maybe you'd rather just show a
+"Permission denied message" and not log him off.  You could do that by
+directing mod_authz_unixgroup to return a 403 error instead of a 401 error.
+You can do this with the following directive:
+
+    AuthnzUnixgroupError 403
+
 By default, mod_authz_unixgroup is authoritative.  If you want to use more
 than one group checker, like mod_authz_unixgroup together with
 mod_authz_groupfile or mod_authz_dbm, then you'll want to make them non-

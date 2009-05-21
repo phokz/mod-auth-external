@@ -325,7 +325,7 @@ exec of '/foo/bar/authcheck' failed: (2) No such file or directory
 
  The status code of -2 (or 254) in the second message indicates that the authenticator crashed or was killed before it could return a status code.  The first method identifies the particular signal number that terminated the process, either because some other process sent the signal, or because the program executed an illegal command causing a segmentation fault.  Again, the "Password Mismatch" message from Apache is pretty meaningless.
 
- * There are several other internal errors that theoretically occur in mod_authnz_external which will also be reported with error messages and negative status codes, similar to the previous example.  These are rare and generally indicate really unusual exhaustions of system resources or bugs in mod_authnz_external, apache, or other modules.  Read the source or contact the mod_authnz_external developers for help.
+ * There are several other internal errors that can theoretically occur in mod_authnz_external which will also be reported with error messages and negative status codes, similar to the previous example.  These are rare and generally indicate really unusual exhaustions of system resources or bugs in mod_authnz_external, apache, or other modules.  Read the source or contact the mod_authnz_external developers for help.
 
  * Error log says "Failed (X) for user foo" with X being some usually positive number and no other more specific error messages.
 

@@ -35,7 +35,7 @@ Require file-group
 }}}
 This would allow access to the page only if the user was a member of whichever unix group owns the file.
 
-Note however, that when access is denied, either because the file does not exist or because the user is not in the group that owns the file, then the normal response will be for the browser to flush it's cached login and password for the authentication realm, and give the user a new login prompt. The user will have to re-login to access other files in the realm that they do have access to. This may be clumsy in some applications, where it would be much nicer to display a "permission denied" error message and not flush the user's credentials. I don't know of a fix for this though. HTTP authentication realms are kind of designed with the assumption that you have access to everything in the realm or nothing and `mod_authz_owner` kind of subverts that.
+Note however, that when access is denied, either because the file does not exist or because the user is not in the group that owns the file, then the normal response will be for the browser to flush it's cached login and password for the authentication realm, and give the user a new login prompt. The user will have to re-login to access other files in the realm that they do have access to. This may be clumsy in some applications, where it would be much nicer to display a "permission denied" error message and not flush the user's credentials.  
 
 == Installation and Configuration ==
 
@@ -66,11 +66,22 @@ the unix password file.
 A user is considered to be in a group if either (1) the group is the user's primary group
 identified by it's gid number in `/etc/passwd`, or (2) the group is listed in `/etc/group` and the user id is listed as a member of that group.
 
+An alternative is to install the `mod_authz_owner` module (which is part of the Apache distribution, but not usually part of the default install) and do:
+{{{
+require file-group
+}}}
+
+Note however, that when access is denied, either because the file does not exist or because the user is not in the group that owns the file, then the normal response will be for the browser to flush it's cached login and password for the authentication realm, and give the user a new login prompt. The user will have to re-login to access other files in the realm that they do have access to. This may be clumsy in some applications, where it would be much nicer to display a "permission denied" error message and not flush the user's credentials.  This can be achieved by telling `mod_authz_unixgroup` to return a 403 error when authentication fails instead of the normal 401 error:
+{{{
+AuthzUnixgroupError 403
+}}}
+You may want to customize the 403 error page if you do this.
+
 By default, `mod_authz_unixgroup` is authoritative.  If you want to use more
 than one group checker, like `mod_authz_unixgroup` together with
 `mod_authz_groupfile` or `mod_authz_dbm`, then you'll want to make them non-
 authoritative, so that if one fails, the other will be tried.  You can
 make `mod_authz_unixgroup` non-authoritative by saying:
 {{{
-   AuthzUnixgroupAuthoritative off
+AuthzUnixgroupAuthoritative off
 }}}

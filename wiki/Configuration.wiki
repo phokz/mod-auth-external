@@ -286,7 +286,7 @@ If it doesn't work, check the apache error logs.  They are loaded with helpful i
 
  * Miscellaneous odd behaviors.
 
- Did you restart the httpd after the last time you edited the  httpd.conf file or recompiled Apache?  Confirm that an  "Apache configured -- resuming normal operations" message appeared  in the error log when you restarted.
+ Did you restart the httpd after the last time you edited the  httpd.conf file, installed a new version of the module, or recompiled Apache?  Confirm that an  "Apache configured -- resuming normal operations" message appeared  in the error log when you restarted.
 
  * Apache complains about not recognizing `mod_authnz_external` commands in the `httpd.conf` file like "`DefineExternalAuth`" and "`AddExternalAuth`".
 

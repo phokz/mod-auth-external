@@ -2,6 +2,9 @@
 
 = Mod_authz_unixgroup =
 
+*Author*: Jan Wolter [http://www.unixpapa.com/white.cgi email]<br>
+*Mailing List*: [http://groups.google.com/group/mod_auth_external mod_auth_external@googlegroups.com]
+
 == Introduction: ==
 
 `Mod_Authz_Unixgroup` is a unix group access control module for Apache 2.1 and later. If you are having users authenticate with real Unix login ID over the net, using something like my [http://code.google.com/p/mod-auth-external mod_authnz_external] / [http://code.google.com/p/pwauth pwauth\] combination, and you want to do access control based on unix group membership, then `mod_authz_unixgroup` is exactly what you need.

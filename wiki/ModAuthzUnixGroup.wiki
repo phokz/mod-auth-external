@@ -26,17 +26,6 @@ Some authentication modules, like `mod_auth_kerb`, use usernames that have domai
 
 It will come as no surprise that this module works only on Unix systems. It should work on pretty much any vaguely modern Unix.
 
-== Use with mod_authz_owner: ==
-
-You could use `mod_authz_unixgroup` together with the standard apache module `mod_authz_owner` to do something like:
-{{{
-AuthzUnixgroup on
-Require file-group
-}}}
-This would allow access to the page only if the user was a member of whichever unix group owns the file.
-
-Note however, that when access is denied, either because the file does not exist or because the user is not in the group that owns the file, then the normal response will be for the browser to flush it's cached login and password for the authentication realm, and give the user a new login prompt. The user will have to re-login to access other files in the realm that they do have access to. This may be clumsy in some applications, where it would be much nicer to display a "permission denied" error message and not flush the user's credentials.  
-
 == Installation and Configuration ==
 
 To install the module in Apache, you follow pretty much the [Installation same procedure] as for `mod_auth_external`.

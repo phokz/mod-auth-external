@@ -40,6 +40,7 @@ typedef struct
 {
     int  enabled;
     int  authoritative;
+    char *errcode;
 
 } authz_unixgroup_dir_config_rec;
 
@@ -57,6 +58,7 @@ static void *create_authz_unixgroup_dir_config(apr_pool_t *p, char *d)
 
     dir->enabled= 0;
     dir->authoritative= 1;	/* strong by default */
+    dir->errcode= NULL;		/* default to 401 */
 
     return dir;
 }
@@ -80,6 +82,12 @@ static const command_rec authz_unixgroup_cmds[] =
 	OR_AUTHCFG,
 	"Set to 'off' to allow access control to be passed along to lower "
 	    "modules if this module can't confirm access rights" ),
+
+    AP_INIT_TAKE1("AuthzUnixgroupError",
+	ap_set_string_slot,
+	(void *)APR_OFFSETOF(authz_unixgroup_dir_config_rec, errcode),
+	OR_AUTHCFG,
+	"HTTP error code to return when user is not in group" ),
 
     { NULL }
 };
@@ -169,11 +177,11 @@ static int authz_unixgroup_check_user_access(request_rec *r)
 	ap_get_module_config(r->per_dir_config, &authz_unixgroup_module);
 
     int m= r->method_number;
-    int required_group= 0;
-    register int x;
+    int i,ret;
     const char *t, *w;
     const apr_array_header_t *reqs_arr= ap_requires(r);
     const char *filegroup= NULL;
+    int required_group= 0;
     require_line *reqs;
 
     /* If not enabled, pass */
@@ -184,11 +192,11 @@ static int authz_unixgroup_check_user_access(request_rec *r)
     reqs=  (require_line *)reqs_arr->elts;
 
     /* Loop through the "Require" argument list */
-    for(x= 0; x < reqs_arr->nelts; x++)
+    for(i= 0; i < reqs_arr->nelts; i++)
     {
-	if (!(reqs[x].method_mask & (AP_METHOD_BIT << m))) continue;
+	if (!(reqs[i].method_mask & (AP_METHOD_BIT << m))) continue;
 
-	t= reqs[x].requirement;
+	t= reqs[i].requirement;
 	w= ap_getword_white(r->pool, &t);
 
 	/* The 'file-group' directive causes mod_authz_owner to store the
@@ -228,11 +236,13 @@ static int authz_unixgroup_check_user_access(request_rec *r)
 
     /* Authentication failed and we are authoritive, declare unauthorized */
     ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
-    	"access to %s failed, reason: user %s not allowed access",
-    	r->uri, r->user);
+    	"access to %s failed, reason: user %s not allowed access (%s)",
+    	r->uri, r->user, dir->errcode);
 
     ap_note_basic_auth_failure(r);
-    return HTTP_UNAUTHORIZED;
+
+    return (dir->errcode && (ret= atoi(dir->errcode)) > 0) ? ret :
+    	HTTP_UNAUTHORIZED;
 }
 
 static void authz_unixgroup_register_hooks(apr_pool_t *p)

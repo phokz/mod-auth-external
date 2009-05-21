@@ -1,6 +1,9 @@
-v1.0.2   (Jan Wolter - not yet released)
+v1.0.2   (Jan Wolter - May 21, 2009)
 ------------------------------------
- * Adding copyright and Apache Version 2.0 license
+ * Adding copyright and Apache Version 2.0 license in LICENSE and NOTICE
+   files.
+ * New directive:  AuthzUnixgroupError, can be used to specify the HTTP
+   error number to be returned on failure.
 
 v1.0.1   (Jan Wolter - Aug 6, 2008)
 ------------------------------------

@@ -2,8 +2,8 @@
 
 = Mod_authz_unixgroup =
 
-*Author*: Jan Wolter [http://www.unixpapa.com/white.cgi email]<br>
-*Mailing List*: [http://groups.google.com/group/mod_auth_external mod_auth_external@googlegroups.com]
+*Author and Maintainer:* Jan Wolter [http://www.unixpapa.com/white.cgi email]<br>
+*Mailing List:* [http://groups.google.com/group/mod_auth_external mod_auth_external@googlegroups.com]
 
 == Introduction: ==
 

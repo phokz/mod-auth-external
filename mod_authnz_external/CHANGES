@@ -1,13 +1,22 @@
-v3.2.4   (Jan Wolter - May 15, 2009)
+v3.2.4   (Jan Wolter - May 20, 2009)
 -----------------------------------------------
  * Dropped the radius code from the distribution, because of possible problems
-   with it's license.
+   with it's license.  Thanks to Hai Zaar for pointing out this problem.
  * Modified AuthExternal directive to be able to take more than one
    authenticator name.  If more than one is defined, then each authenticator
    is run in turn, until one succeeds or all have failed.  Probably a similar
    change should be made to GroupExternal, but it hasn't been done yet because
-   it's a more complex change and nobody has asked for it.
- * Clean-up of handling of return codes from apr_proc_wait().
+   it's a more complex change and nobody has asked for it.  Thanks to Andreas
+   Ntaflos for suggesting this change.
+ * Inserted code to restore SIGCHLD to default before running the
+   authenticator.  Sometime other modules (like php built with the
+   --enable-sigchild option) leave SIGCHLD messed up, which would cause
+   problems with getting the return code back from authenticators.  We
+   restore SIGCHLD to whatever state it was in originally after the
+   authenticator terminates.  Thanks to Stefan Mehlhorn for reporting this
+   problem and providing the help needed to diagnose it.
+ * Clean-up of handling of return codes from apr_proc_wait() to be more
+   formally correct.
 
 v3.2.3   (Jan Wolter - Feb 26, 2009)
 -----------------------------------------------

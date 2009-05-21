@@ -315,14 +315,18 @@ exec of '/foo/bar/authcheck' failed: (2) No such file or directory
 
  * Authentications failed and the message in the error log says it failed with a status code of -2 or 254, for example:
 {{{
-[Thu Nov 15 12:26:43 2007] [error] AuthExtern authcheck
-   [/foo/bar/authcheck]: Failed (-2) for user foo
-[Thu Nov 15 12:26:43 2007] [error] user foo: authentication
-   failure for /mae/index.html": Password Mismatch
+[Thu May 21 12:29:46 2009] [error] [client 127.0.0.1]
+   External authenticator died on signal 9
+[Thu May 21 12:29:46 2009] [error] [client 127.0.0.1]
+   AuthExtern authcheck [/foo/bar/authcheck]: Failed (-2) for user foo
+[Thu May 21 12:29:46 2009] [error] [client 127.0.0.1]
+   user foo: authentication failure for "/mae/index.html": Password Mismatch
 }}}
 
- A status code of -2 (or 254) indicates that the authenticator crashed or was killed before it could return a status code.  This could either be because some other process sent it a signal to terminate it, or it crashed due to some kind internal error in the code, causing a segmentation fault or some other similar crash.
+ The status code of -2 (or 254) in the second message indicates that the authenticator crashed or was killed before it could return a status code.  The first method identifies the particular signal number that terminated the process, either because some other process sent the signal, or because the program executed an illegal command causing a segmentation fault.  Again, the "Password Mismatch" message from Apache is pretty meaningless.
 
- * Error log says "Failed (X) for user foo" with X being some number other than 255 or -1.
+ * There are several other internal errors that theoretically occur in mod_authnz_external which will also be reported with error messages and negative status codes, similar to the previous example.  These are rare and generally indicate really unusual exhaustions of system resources or bugs in mod_authnz_external, apache, or other modules.  Read the source or contact the mod_authnz_external developers for help.
 
- The authenticator ran, and exited with the given non-zero return code.  You'll have to check the authenticator to see under what conditions it exits with that return code.
+ * Error log says "Failed (X) for user foo" with X being some usually positive number and no other more specific error messages.
+
+ This means the authenticator ran, and exited with the given non-zero return code.  You'll have to check the authenticator to see under what conditions it exits with that return code. This is the normal expected behavior for mod_authnz_external when an authenticator rejects a login.

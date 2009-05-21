@@ -207,3 +207,15 @@ The PATH environment variable passed to the authenticator is just whatever PATH 
 The COOKIE environment variable contains all cookies set in the current request.  This has the same format as the HTTP_COOKIES ("`key=val;key=val`") passed to a CGI program.  This should be used with caution.  Cookies come from the user's computer and might have been created, editted or deleted by the user rather than your website.  This severely limits their use for authentication.  It is not possible to set cookies from an authentication module.
 
 The URI variable is there because various people want it.  Mostly it is useful not for authentication ("who is this person?") but for access control ("is this person permitted to do this?"), and good design usually dictates separating those functions.  Strictly speaking, an authenticator is not the right place to be doing access control.  However, `mod_authnz_external` is 50% a kludge-builder's tool, so we won't fuss if you want to break the rules.
+
+== 6. Testing ==
+
+You should test you authenticator in isolation before trying to run it from `mod_authnz_external`.  For an authenticator that takes input from a pipe, I typically issue the following command from 'csh' or 'tcsh':
+{{{
+./myauth; echo $status
+}}}
+or from 'sh' or 'bash':
+{{{
+./myauth; echo $?
+}}}
+Then I type in the login and password, one per line.  The correct status code should come back right after I enter the password, zero for valid logins, other values for invalid ones.

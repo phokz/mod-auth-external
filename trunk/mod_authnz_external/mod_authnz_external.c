@@ -648,12 +648,11 @@ static int authz_external_check_user_access(request_rec *r)
     authnz_external_svr_config_rec *svr= (authnz_external_svr_config_rec *)
 	ap_get_module_config(r->server->module_config, &authnz_external_module);
 
-    int code, ret;
+    int i, code, ret;
     int m= r->method_number;
     const char *extpath, *extmethod;
     char *extname= dir->group_name;
     int required_group= 0;
-    register int x;
     const char *t, *w;
     const apr_array_header_t *reqs_arr= ap_requires(r);
     const char *filegroup= NULL;
@@ -668,11 +667,11 @@ static int authz_external_check_user_access(request_rec *r)
 
 
     /* Loop through the "Require" argument list */
-    for(x= 0; x < reqs_arr->nelts; x++)
+    for(i= 0; i < reqs_arr->nelts; i++)
     {
-	if (!(reqs[x].method_mask & (AP_METHOD_BIT << m))) continue;
+	if (!(reqs[i].method_mask & (AP_METHOD_BIT << m))) continue;
 
-	t= reqs[x].requirement;
+	t= reqs[i].requirement;
 	w= ap_getword_white(r->pool, &t);
 
 	/* The 'file-group' directive causes mod_authz_owner to store the

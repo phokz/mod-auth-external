@@ -514,9 +514,10 @@ static int exec_external(const char *extpath, const char *extmethod,
 
 	/* should we create pipes to stdin, stdout and stderr? */
         ((rc= apr_procattr_io_set(procattr,
-	    usepipein  ? APR_FULL_BLOCK : APR_NO_PIPE,
+	    (usepipein && !usecheck) ? APR_FULL_BLOCK : APR_NO_PIPE,
 	    usepipeout ? APR_FULL_BLOCK : APR_NO_PIPE,
-	    APR_NO_PIPE)) != APR_SUCCESS) ||
+	    (usepipein && usecheck) ? APR_FULL_BLOCK : APR_NO_PIPE))
+	       != APR_SUCCESS ) ||
 
 	/* will give full path of program and make a new environment */
 	((rc= apr_procattr_cmdtype_set(procattr,
@@ -557,19 +558,22 @@ static int exec_external(const char *extpath, const char *extmethod,
 
     if (usepipein)
     {
+	/* Select appropriate pipe to write to */
+	apr_file_t *pipe= (usecheck ? proc.err : proc.in);
+
 	/* Send the user */
-	apr_file_write_full(proc.in, r->user, strlen(r->user), NULL);
-	apr_file_putc(usecheck ? '\0' : '\n', proc.in);
+	apr_file_write_full(pipe, r->user, strlen(r->user), NULL);
+	apr_file_putc(usecheck ? '\0' : '\n', pipe);
 
 	/* Send the password */
-	apr_file_write_full(proc.in, data, strlen(data), NULL);
-	apr_file_putc(usecheck ? '\0' : '\n', proc.in);
+	apr_file_write_full(pipe, data, strlen(data), NULL);
+	apr_file_putc(usecheck ? '\0' : '\n', pipe);
 
 	/* Send dummy timestamp for checkpassword */
-	if (usecheck) apr_file_write_full(proc.in, "0", 2, NULL);
+	if (usecheck) apr_file_write_full(pipe, "0", 2, NULL);
 
 	/* Close the file */
-	apr_file_close(proc.in);
+	apr_file_close(pipe);
     }
 
     /* Wait for the child process to terminate, and get status */

@@ -1,3 +1,8 @@
+v3.2.5   (Jan Wolter - Oct 29, 2009)
+-----------------------------------------------
+ * Fixed a bug introduced in 3.2.0 in which data for checkpassword-type
+   authenticators is written to the authenticator's stdin instead of stderr.
+
 v3.2.4   (Jan Wolter - May 20, 2009)
 -----------------------------------------------
  * Dropped the radius code from the distribution, because of possible problems

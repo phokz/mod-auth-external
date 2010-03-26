@@ -451,6 +451,11 @@ instructions to your server configuration.
 
         GroupExternalManyAtOnce off
 
+    If you have GroupExternalManyAtOnce turned off, then you can have
+    spaces in your group names by enclosing the names in quote marks.
+    If it is on, then all parsing of the group name list is up to your
+    authenticator.
+
     If, instead of listing group names, you want to allow access only
     to users whose group name (as determined by whatever group database
     your external group checker uses) matches the unix group name that

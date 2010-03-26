@@ -724,7 +724,7 @@ static int authz_external_check_user_access(request_rec *r)
 		{
 		    /* Call authenticator once for each group name on line */
 		    do {
-		        w= ap_getword_white(r->pool, &t);
+		        w= ap_getword_conf(r->pool, &t);
 			code= exec_external(extpath,
 				extmethod, r, ENV_GROUP, w);
 			if (code == 0) return OK;

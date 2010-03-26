@@ -1,3 +1,9 @@
+v3.2.6   (Jan Wolter - )
+-----------------------------------------------
+ * Modified parsing of "Require groups" line so that you can have group
+   names that include spaces by enclosing them in quotes.  Haven't actually
+   tested this yet.
+
 v3.2.5   (Jan Wolter - Oct 29, 2009)
 -----------------------------------------------
  * Fixed a bug introduced in 3.2.0 in which data for checkpassword-type

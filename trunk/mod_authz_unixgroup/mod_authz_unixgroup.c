@@ -125,7 +125,7 @@ static int check_unix_group(request_rec *r, const char *grouplist)
     /* Loop through list of groups passed in */
     while (*grouplist != '\0')
     {
-	w= ap_getword_white(r->pool, &grouplist);
+	w= ap_getword_conf(r->pool, &grouplist);
 	if (apr_isdigit(w[0]))
 	{
 	    /* Numeric group id */

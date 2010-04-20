@@ -95,6 +95,8 @@ An LDAP authenticator.
 An IMAP authenticator written in Python that caches credentials for better performance and so you don't overrun server rate limits.
 
 *Available From:* http://www.namazustudios.com/blog/checkpasswd-imap-a-mod_authnz_external-style-password-checker/
+
+*Author:* Patrick Twohig
 </dd>
 
 <dt>`radcheckpassword`</dt>

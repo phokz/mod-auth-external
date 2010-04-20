@@ -37,6 +37,7 @@ The <a href="http://www.kernel.org/pub/linux/libs/pam/modules.html">list of PAM 
 </li>
 
 <li>[http://www.namazustudios.com/blog/checkpasswd-imap-a-mod_authnz_external-style-password-checker/ checkpassword-imap] An IMAP authenticator written in Python for mod_auth_external that caches credentials for faster performance and so that you don't run up against rate limits on the IMAP server.
+</li>
 </ul>
 
 == How To Pages ==

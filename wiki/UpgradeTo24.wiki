@@ -40,3 +40,29 @@ So mod_authn_socache isn't usable with mod_authnz_external.
 Unless maybe we get sneaky. If the external authenticator comes back and says that the authentication was valid, then we could take the user's submitted plain text password, encrypt it in some way that mod_authn_socache understands, and give that to mod_authn_socache to cache. Basically we'd be fooling mod_authn_socache into thinking we authenticated out of some normal Apache style authentication database.
 
 I think that that could be made to work, but I haven't implemented it yet, being more concerned with just getting mod_authnz_external working in Apache 2.4 first.
+
+=== Authoritativeness ===
+
+In Apache 2.4 the moderation between multiple different access control modules is now controlled entirely by mod_auth_basic, not by the individual modules. This means that the old mod_auth_external directives,
+
+{{{
+   GroupExternalAuthoritative
+   AuthzExternalAuthoritative
+}}}
+
+no longer exist.
+
+=== Modifying Error Codes for Group Checking ===
+
+In previous versions of mod_authnz_external, there was a directive which could
+be used to send a different error code when an access control check failed:
+
+{{{
+   GroupExternalError 403
+}}}
+
+This also no longer exists.  The approximate same effect can be achieved with a new Apache directive:
+
+{{{
+   AuthzSendForbiddenOnFailure On
+}}}

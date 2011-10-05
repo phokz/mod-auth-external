@@ -62,8 +62,10 @@ if (!$dbh) {
 	exit 1;
 }
 
-my $dbq = $dbh->prepare("select username as username, password as password from users where username=\'$user\';");
+my $dbq = $dbh->prepare("select username as username, password as password from users where username=?;");
+$dbq->bind_param(1, $user);
 $dbq->execute;
+
 my $row = $dbq->fetchrow_hashref();
 
 if ($row->{username} eq "") {

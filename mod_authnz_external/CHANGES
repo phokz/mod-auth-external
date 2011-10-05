@@ -4,6 +4,8 @@ v3.2.6   (Jan Wolter - )
    names that include spaces by enclosing them in quotes.  This change
    suggested by David Homborg.  Haven't actually tested this yet.
  * Default action of Makefile changed to "build" not "install".
+ * Corrected an exploitable SQL injection flaw in the sample mysql
+   authenticator.
 
 v3.2.5   (Jan Wolter - Oct 29, 2009)
 -----------------------------------------------

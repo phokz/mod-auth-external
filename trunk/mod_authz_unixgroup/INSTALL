@@ -2,6 +2,12 @@ How to install mod_authz_unixgroup.c into Apache:
 
 NOTES:
 
+ * Different versions of Apache require different versions of
+   mod_authz_unixgroup:
+
+     Apache 2.2.x    requires    mod_authz_unixgroup 1.0.x
+     Apache 2.4.x    requires    mod_authz_unixgroup 1.1.x
+
  * There are two ways of installing mod_authz_unixgroup. 
 
      (1) You can statically link it with Apache.  This requires rebuilding

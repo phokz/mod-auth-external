@@ -4,7 +4,7 @@
 
 If you are upgrading from Apache 2.2 to Apache 2.4 you will need to be aware of several changes in the configuration and behavior of mod_authnz_external.
 
-=== Require Syntax Changes ===
+=== "`Require`" Command Syntax Changes ===
 
 When using an external group checker, the syntax in Apache 2.2 and before was:
 

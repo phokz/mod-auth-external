@@ -23,10 +23,9 @@ following directives:
 That would cause mod_auth_basic and mod_authnz_external to do authentication
 based on the Unix passwd database.  Mod_Authz_Unixgroup would come into play
 if you wanted to further restrict access to specific Unix groups.  You might
-append the following directives:
+append the following directive:
 
-    AuthzUnixgroup on
-    Require group staff admin
+    Require unix-group staff admin
 
 This would allow only access to accounts in the 'staff' or 'admin' unix groups.
 You can alternately specify groups by their gid numbers instead of their names.
@@ -34,7 +33,7 @@ You can alternately specify groups by their gid numbers instead of their names.
 Or you could use mod_authz_unixgroup together with the standard apache module
 mod_authz_owner to do something like:
 
-    Require file-group
+    Require unix-file-group
 
 This would allow access to the page, only the user was a member of the unix
 group that owns the file.
@@ -53,10 +52,10 @@ mod_authz_unixgroup will take the part before the @-sign as the username
 and ignore the rest.
 
 Mod_authnz_external is available from:
-   http://www.unixpapa.com/mod_auth_external/
+   http://code.google.com/p/mod-auth-external/
 
 Pwauth is available from:
-   http://www.unixpapa.com/pwauth/
+   http://code.google.com/p/pwauth/
 
 It might also be possible to use this with mod_auth_shadow, expecially if a
 authn/authz version of that is ever released.

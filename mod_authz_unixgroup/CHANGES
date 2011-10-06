@@ -1,6 +1,12 @@
-v1.1.0   (Jan Wolter - )
+v1.1.0   (Jan Wolter - Oct 6, 2011)
 -----------------------------------
- * Revised to work with Apache 2.4.
+ * Revised to work as an access control provider in Apache 2.4.
+ * Eliminated "AuthzUnixgroup on" directive because it is no longer needed.
+ * Eliminated "AuthnzUnixgroupError 403" directive because it is supplanted
+   by "AuthzSendForbiddenOnFailure On".
+ * Eliminated "AuthzUnixgroupAuthoritative off" directive because the whole
+   concept of authoritativeness is dead for access control providers in
+   Apache 2.4.
 
 v1.0.3   (Jan Wolter - Oct 6, 2011)
 ------------------------------------

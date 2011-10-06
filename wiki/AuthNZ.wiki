@@ -4,4 +4,6 @@ Users of `mod_authnz_external` may find it helpful understand a bit more of it's
 
 The `mod_authn_external` part is an authentication provider for the `mod_auth_basic` module.  `Mod_auth_basic` handles all the negotiations with the browser, while all `mod_authn_external` does is check if a password submitted by the user is correct (which it does by running an external program to perform the check).
 
-The `mod_authz_external` part does access control.  It has no relation to `mod_auth_basic`.  It comes into play after authentication is complete, when a "`Require grou`p" or "`Require file-group`" directive is given.  It checks if the authenticated user is in the list of required groups (which it does by running an external program to perform the check).
+The `mod_authz_external` part does access control.  In Apache version 2.2, it had no relation to `mod_auth_basic`.  It comes into play after authentication is complete, when a "`Require group`" or "`Require file-group`" directive is given.  It checks if the authenticated user is in the list of required groups (which it does by running an external program to perform the check).
+
+In Apache 2.4, the split in functionality remains the same, but the `mod_authz_external` access control checker becomes a provider to `mod_auth_basic` just as the authenticator already was.

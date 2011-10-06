@@ -20,6 +20,15 @@ In Apache 2.4, we need to replace the keyword `group` on the `Require` command w
   Require external-group <groupname1> <groupname2> ...
 }}}
 
+Similarly, if you wanted to check if users were in the group that owns a file, the Apache 2.2 directive was:
+{{{
+  Require file-group
+}}}
+while in Apache 2.4 you must say:
+{{{
+  Require external-file-group
+}}}
+
 === Per Configuration Authentication versus Per URI Authentication ===
 
 In Apache an HTTP request for a URI may sometimes trigger other "sub-requests" for other URIs. For example, there might be an internal redirect to a different page or a .shtml file might use a server-side include to fetch other files. Mod_perl programs and the like can generate sub-requests very freely.

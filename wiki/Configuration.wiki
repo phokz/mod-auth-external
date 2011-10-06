@@ -2,6 +2,8 @@
 
 <wiki:toc max_depth="3" />
 
+*NOTE: These instructions are for configuration under Apache 2.2. There are some differences for Apache 2.3 and 2.4, described on the UpgradeTo24 page.*
+
 There are three parts to doing the configuration.  First, if you are using
 dynamic loading, you need to configure Apache to load the `mod_authnz_external`
 module.  If '`apxs`' is working correctly, it should do this for you

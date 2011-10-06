@@ -22,6 +22,12 @@ NOTES:
 INSTALL METHOD A: Dynamically Linking Mod_authz_unixgroup using apxs:
 ---------------------------------------------------------------------
 
+Step 0:
+        Ensure that you have the correct version of mod_authz_unixgroup.
+
+          Apache 2.2   requires    mod_authz_unixgroup 1.0.x
+          Apache 2.4   requires    mod_authz_unixgroup 1.1.x
+
 Step 1:
 	Ensure that your Apache server is configured to handle dynamically
 	loaded modules.  To check this, run Apache server with the -l command

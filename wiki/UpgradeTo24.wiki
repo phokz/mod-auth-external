@@ -4,6 +4,22 @@
 
 If you are upgrading from Apache 2.2 to Apache 2.4 you will need to be aware of several changes in the configuration and behavior of mod_authnz_external.
 
+=== Require Syntax Changes ===
+
+When using an external group checker, the syntax in Apache 2.2 and before was:
+
+{{{
+  GroupExternal <groupkeyword>
+  Require group <groupname1> <groupname2> ...
+}}}
+
+In Apache 2.4, we need to replace the keyword `group` on the `Require` command with the keyword `external-group`, like this:
+
+{{{
+  GroupExternal <groupkeyword>
+  Require external-group <groupname1> <groupname2> ...
+}}}
+
 === Per Configuration Authentication versus Per URI Authentication ===
 
 In Apache an HTTP request for a URI may sometimes trigger other "sub-requests" for other URIs. For example, there might be an internal redirect to a different page or a .shtml file might use a server-side include to fetch other files. Mod_perl programs and the like can generate sub-requests very freely.

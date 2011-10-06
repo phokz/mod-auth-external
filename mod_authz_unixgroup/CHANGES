@@ -1,8 +1,12 @@
-v1.0.3   (Jan Wolter - )
+v1.1.0   (Jan Wolter - )
+-----------------------------------
+ * Revised to work with Apache 2.4.
+
+v1.0.3   (Jan Wolter - Oct 6, 2011)
 ------------------------------------
  * Allow group names to be quoted, so that you can have group names with
-   spaces in them.  This change was suggested by David Homborg.  Not yet
-   tested.
+   spaces in them.  This change was suggested by David Homborg.
+ * Document updated with references to versions for Apache 2.4.
 
 v1.0.2   (Jan Wolter - May 21, 2009)
 ------------------------------------

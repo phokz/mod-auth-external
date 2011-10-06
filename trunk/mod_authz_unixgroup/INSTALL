@@ -95,18 +95,14 @@ Step 4:
 CONFIGURATION:
 --------------
 
-Mod_authz_unixgroup is pretty simple to use.  First, you need to enable it
-for whatever directory you want to use it in, by inserting the following
-directive either in a .htaccess file in the directory or a <Directory> block
-in the httpd.conf file:
+Mod_authz_unixgroup is extremely simple to use. Presumably you already are
+setting up some kind of authentication in a .htaccess file or in a
+<Directory> block in the httpd.conf file. You'll just need to change the
+"Require" directive there to something like:
 
-    AuthzUnixgroup on
-
-Second, you will need a require directive like
-
-    Require group admin
+    Require unix-group admin
 or
-    Require group students teachers staff
+    Require unix-group students teachers staff
 
 Obviously this only makes sense in a directory where you are doing
 authentication.  This could be any kind of authentication, but it makes
@@ -127,7 +123,7 @@ be in one of the unix groups listed on the Require line.
 
 It is also possible to list groups by gid number instead of name, like
 
-    Require group 10
+    Require unix-group 10
 
 would be equivalent to "Require group admin" if the gid listed for the group
 admin in /etc/group is 10.
@@ -136,11 +132,19 @@ If mod_authz_owner is enabled in your httpd, then that will work with
 mod_authz_unixgroup to check access based on file groups.  For example if
 we do:
 
-    AuthzUnixgroup on
-    Require file-group
+    Require unix-file-group
 
 Then a user will be able to access a file if and only if that file is owned
 by a group of which the user is a member.
+
+Changes from Previous Versions:
+-------------------------------
+
+Previous versions of mod_authz_unixgroup needed a 'AuthzUnixgroup on' to
+tell Apache that the "Require file-group" directive was supposed to be
+handled by mod_authz_unixgroup. Now we have a distinct directive,
+"Require unix-file-group" instead, so the 'AuthzUnixgroup' is no longer
+needed and no longer exists.
 
 Normally, when an access check fails, mod_authz_unixgroup will return a
 HTTP 401 error.  This will typically cause the browser to pop up a message
@@ -149,15 +153,12 @@ name.  In some cases this is not the desired behavior.  If you are using the
 "Require file-group" directive, you may not want to log the user off every time
 he hits a file he doesn't have access to.  Maybe you'd rather just show a
 "Permission denied message" and not log him off.  You could do that by
-directing mod_authz_unixgroup to return a 403 error instead of a 401 error.
-You can do this with the following directive:
+returning 403 error instead of a 401 error.  Older versions of
+mod_authz_unixgroup had a directive called 'AuthnzUnixgroupError' that did
+this, but in Apache 2.4 that is replaced with a new standard Apache directive:
 
-    AuthnzUnixgroupError 403
+    AuthzUnixgroupAuthoritative off
 
-By default, mod_authz_unixgroup is authoritative.  If you want to use more
-than one group checker, like mod_authz_unixgroup together with
-mod_authz_groupfile or mod_authz_dbm, then you'll want to make them non-
-authoritative, so that if one fails, the other will be tried.  You can
-make mod_authz_unixgroup non-authoritative by saying:
-
-   AuthzUnixgroupAuthoritative off
+There also used to be an 'AuthzUnixgroupAuthoritative' directive which is
+also gone, since the whole concept of authoritativeness no longer applies
+to access control providers in Apache 2.4.

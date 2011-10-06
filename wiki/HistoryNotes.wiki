@@ -4,7 +4,7 @@
 
 The first version of `mod_auth_external` was written by Nathan Neulinger.  My theory is that he started with some apache module, like 'mod_auth_file' and started editing it to turn it into `mod_auth_external`.  He just left the original Apache license in there. It was, after all, still partly Apache's code.  This is why the copyright message in 'mod_auth_external' says the copyright is held by the Apache Group, although the Apache group is in no way responsible for this code.
 
-Since then `mod_auth_external` has suffered two  major rewrites and many small evolutionary changes, and about all that is untouched is the 1995 vintage Apache copyright/license message in front.  Does this make sense?  The authors of 'mod_auth_external' haven't the faintest idea and none of them care very much.
+Since then `mod_auth_external` has suffered three  major rewrites and many small evolutionary changes, and about all that is untouched is the 1995 vintage Apache copyright/license message in front.  Does this make sense?  The authors of 'mod_auth_external' haven't the faintest idea and none of them care very much.
 
 == Version Branches ==
 

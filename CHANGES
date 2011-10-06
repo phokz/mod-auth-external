@@ -6,6 +6,7 @@ v3.2.6   (Jan Wolter - Oct 6, 2011)
  * Default action of Makefile changed to "build" not "install".
  * Corrected an exploitable SQL injection flaw in the sample mysql
    authenticator.
+ * Add references to version 3.3.x to documentation.
 
 v3.2.5   (Jan Wolter - Oct 29, 2009)
 -----------------------------------------------

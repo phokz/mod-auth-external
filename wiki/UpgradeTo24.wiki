@@ -1,8 +1,8 @@
 #summary Upgrading from Apache 2.2 to Apache 2.4
 
-*NOTE: This page is a draft. A version of mod_authnz_external for Apache 2.3 / 2.4 is currently under development, but is not yet available. Please stay tuned.*
+If you are upgrading from Apache 2.2 to Apache 2.3 or 2.4 you will need to be aware of several changes in the configuration and behavior of mod_authnz_external.
 
-If you are upgrading from Apache 2.2 to Apache 2.4 you will need to be aware of several changes in the configuration and behavior of mod_authnz_external.
+First, you must use `mod_authnz_external` version 3.3.  Previous versions will not work with Apache 2.3 or 2.4.
 
 === "`Require`" Command Syntax Changes ===
 

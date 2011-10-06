@@ -24,6 +24,7 @@ AuthBasicProvider external
 AuthExternal pwauth
 }}}
 That would cause `mod_auth_basic` and `mod_authnz_external` to do authentication based on the Unix `passwd` database. `Mod_Authz_Unixgroup` would come into play if you wanted to further restrict access to specific Unix groups. You might append the following directives:
+
 *Apache 2.2:*
 {{{
 AuthzUnixgroup on

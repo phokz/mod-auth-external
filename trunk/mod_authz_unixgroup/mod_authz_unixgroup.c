@@ -32,50 +32,9 @@
  */
 module AP_MODULE_DECLARE_DATA authz_unixgroup_module;
 
-/* The current version doesn't actually have any configuration at all. In
- * case we ever need it back again, the remnants of the config code are
- * ifdef'ed out
- */
-
-#ifdef CONFIG_STUFF
-/*
- *  Data type for per-directory configuration
- */
-
-typedef struct
-{
-    int dummy;		/* Just to keep compilers from complaining */
-} authz_unixgroup_dir_config_rec;
-
-#endif
-
 /* A handle for retrieving the requested file's group from mod_authnz_owner */
 APR_DECLARE_OPTIONAL_FN(char*, authz_owner_get_file_group, (request_rec *r));
 
-#ifdef CONFIG_STUFF
-/*
- * Creator for per-dir configurations.  This is called via the hook in the
- * module declaration to allocate and initialize the per-directory
- * configuration data structures declared above.
- */
-
-static void *create_authz_unixgroup_dir_config(apr_pool_t *p, char *d)
-{
-    authz_unixgroup_dir_config_rec *dir= (authz_unixgroup_dir_config_rec *)
-	apr_palloc(p, sizeof(authz_unixgroup_dir_config_rec));
-
-    return dir;
-}
-
-/*
- * Config file commands that this module can handle
- */
-
-static const command_rec authz_unixgroup_cmds[] =
-{
-    { NULL }
-};
-#endif
 
 /* Check if the named user is in the given list of groups.  The list of
  * groups is a string with groups separated by white space.  Group ids
@@ -157,11 +116,6 @@ static int check_unix_group(request_rec *r, const char *grouplist)
 static authz_status unixgroup_check_authorization(request_rec *r,
         const char *require_args, const void *parsed_require_args)
 {
-#ifdef CONFIG_STUFF
-    authz_unixgroup_dir_config_rec *dir= (authz_unixgroup_dir_config_rec *)
-        ap_get_module_config(r->per_dir_config, &authz_unixgroup_module);
-#endif
-
     /* If no authenticated user, pass */
     if ( !r->user ) return AUTHZ_DENIED_NO_USER;
 
@@ -181,10 +135,6 @@ APR_OPTIONAL_FN_TYPE(authz_owner_get_file_group) *authz_owner_get_file_group;
 static authz_status unixfilegroup_check_authorization(request_rec *r,
         const char *require_args, const void *parsed_require_args)
 {
-#ifdef CONFIG_STUFF
-    authz_unixgroup_dir_config_rec *dir= (authz_unixgroup_dir_config_rec *)
-        ap_get_module_config(r->per_dir_config, &authz_unixgroup_module);
-#endif
     const char *filegroup= NULL;
 
     /* If no authenticated user, pass */
@@ -235,24 +185,12 @@ static void authz_unixgroup_register_hooks(apr_pool_t *p)
             &authz_unixfilegroup_provider, AP_AUTH_INTERNAL_PER_CONF);
 }
     
-#ifndef CONFIG_STUFF
 module AP_MODULE_DECLARE_DATA authz_unixgroup_module = {
     STANDARD20_MODULE_STUFF,
-    NULL,	  /* create per-dir config */
+    NULL,				  /* create per-dir config */
     NULL,			          /* merge per-dir config */
     NULL,			          /* create per-server config */
     NULL,			          /* merge per-server config */
-    NULL,		          /* command apr_table_t */
+    NULL,		         	  /* command apr_table_t */
     authz_unixgroup_register_hooks        /* register hooks */
 };
-#else
-module AP_MODULE_DECLARE_DATA authz_unixgroup_module = {
-    STANDARD20_MODULE_STUFF,
-    create_authz_unixgroup_dir_config,	  /* create per-dir config */
-    NULL,			          /* merge per-dir config */
-    NULL,			          /* create per-server config */
-    NULL,			          /* merge per-server config */
-    authz_unixgroup_cmds,	          /* command apr_table_t */
-    authz_unixgroup_register_hooks        /* register hooks */
-};
-#endif

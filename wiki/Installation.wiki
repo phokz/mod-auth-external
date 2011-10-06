@@ -49,7 +49,7 @@ Use the following command in the 'mod_authnz_external` distribution directory:
 
 Apxs should create a file named '`mod_authnz_external.so`'.
 
-_AIX USERS_:  If you have problems at this point, see the notes in the INSTALLATION FILE.
+_AIX USERS_:  If you have problems at this point, see the notes in the INSTALL file.
 
 === (3) Install the Module ===
 

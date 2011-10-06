@@ -49,8 +49,8 @@ How to upgrade from mod_auth_external to mod_authnz_external:
 
         AuthExternalAuthoritative off
 
-     This command will no longer work.  Instead you should use one or both
-     of the following commands:
+     This command will no longer work.  If upgrading to Apache 2.2, you
+     should use one or both of the following commands:
 
         AuthBasicAuthoritative off
         GroupExternalAuthoritative off
@@ -65,6 +65,9 @@ How to upgrade from mod_auth_external to mod_authnz_external:
      "Require group admin" directive was the only one to run, or whether each
      group checker was given a chance to decide if the user was in that group
      based on it's group database.
+
+     In Apache 2.4, all of this is handled quite differently. I need to
+     document this.
 
 (6)  If you were using multiple Require directives, the behavior may change
      under Apache 2.2.  Suppose you wanted to allow access to user "pete" and
@@ -85,6 +88,9 @@ How to upgrade from mod_auth_external to mod_authnz_external:
 
         GroupUserAuthoritative off
 
+     Again, in Apache 2.4, all of this is handled quite differently, and this
+     document needs updating.
+
 (7)  Note that a new type of functionality is available under Apache 2.2 with
      mod_authnz_external.  Thanks to mod_authz_owner, you can now do:
 
@@ -103,3 +109,7 @@ How to upgrade from mod_auth_external to mod_authnz_external:
      being used for http authentication, but for people using 'pwauth'
      with mod_authnz_external, these really check if the user has been
      authenticated as the unix user who owns the file.
+
+     In Apache 2.4, this is the same, except the latter of the two becomes:
+
+         Require external-file-group

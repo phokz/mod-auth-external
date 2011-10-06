@@ -48,24 +48,6 @@ Well, if broke the rule and wrote an external authenticator that uses the URI en
 
 I think the number of people likely to be troubled by this issue is somewhere between "a couple" and "none". If you are among those people, you should either (1) redesign your authentication setup, or (2) edit the mod_authnz_external source code before installing it, changing three instances of "AP_AUTH_INTERNAL_PER_CONF" to "AP_AUTH_INTERNAL_PER_URI". I considered adding a configuration directive to mod_authnz_external that would let you switch the setting in a nicer way, but I suspect it would have to bypass the Apache API to work, and it's just not worth it.
 
-=== Mod_authn_socache ===
-
-In version 2.4, Apache introduces a new authentication module with can cache authentication credentials so they can be reused in later requests. This is especially attractive when you are authenticating out of some slow database like MySQL.
-
-It'd be nice to use this with mod_authnz_external to, since external authentications are frequently slow. Unfortunately, it doesn't really do the job.
-
-In a typical authentication, the page request would include a username and plain text password. We'd use the username as a key into our database to retrieve an encrypted copy of the correct password for the user. We then encrypt the submitted password, and compare it to the database password. If it matches, the authentication succeeds, otherwise it fails.
-
-What mod_authn_socache caches is the username and the encrypted password from the database. On future requests, it checks the cache to see if it has an encrypted password for the user. If it does it encrypts the submitted password and compares them.
-
-This is fine, but it doesn't work naturally with mod_authnz_external. In our case, all database accesses are handled by the external authenticator. All it returns to mod_authnz_external is a yes/no flag for whether or not the submitted password was correct. Mod_authnz_external doesn't have an encrypted database password to cache, and even if it somehow got that back from the external authenticator, there is no guarantee that it would be encrypted in a way that mod_authn_socache would understand.
-
-So mod_authn_socache isn't usable with mod_authnz_external.
-
-Unless maybe we get sneaky. If the external authenticator comes back and says that the authentication was valid, then we could take the user's submitted plain text password, encrypt it in some way that mod_authn_socache understands, and give that to mod_authn_socache to cache. Basically we'd be fooling mod_authn_socache into thinking we authenticated out of some normal Apache style authentication database.
-
-I think that that could be made to work, but I haven't implemented it yet, being more concerned with just getting mod_authnz_external working in Apache 2.4 first.
-
 === Authoritativeness ===
 
 In Apache 2.4 the moderation between multiple different access control modules is now controlled entirely by mod_auth_basic, not by the individual modules. This means that the old mod_auth_external directives,
@@ -91,3 +73,21 @@ This also no longer exists.  The approximate same effect can be achieved with a 
 {{{
    AuthzSendForbiddenOnFailure On
 }}}
+
+=== Mod_authn_socache ===
+
+In version 2.4, Apache introduces a new authentication module with can cache authentication credentials so they can be reused in later requests. This is especially attractive when you are authenticating out of some slow database like MySQL.
+
+It'd be nice to use this with mod_authnz_external to, since external authentications are frequently slow. Unfortunately, it doesn't really do the job.
+
+In a typical authentication, the page request would include a username and plain text password. We'd use the username as a key into our database to retrieve an encrypted copy of the correct password for the user. We then encrypt the submitted password, and compare it to the database password. If it matches, the authentication succeeds, otherwise it fails.
+
+What mod_authn_socache caches is the username and the encrypted password from the database. On future requests, it checks the cache to see if it has an encrypted password for the user. If it does it encrypts the submitted password and compares them.
+
+This is fine, but it doesn't work naturally with mod_authnz_external. In our case, all database accesses are handled by the external authenticator. All it returns to mod_authnz_external is a yes/no flag for whether or not the submitted password was correct. Mod_authnz_external doesn't have an encrypted database password to cache, and even if it somehow got that back from the external authenticator, there is no guarantee that it would be encrypted in a way that mod_authn_socache would understand.
+
+So mod_authn_socache isn't usable with mod_authnz_external.
+
+Unless maybe we get sneaky. If the external authenticator comes back and says that the authentication was valid, then we could take the user's submitted plain text password, encrypt it in some way that mod_authn_socache understands, and give that to mod_authn_socache to cache. Basically we'd be fooling mod_authn_socache into thinking we authenticated out of some normal Apache style authentication database.
+
+I think that that could be made to work, but I haven't implemented it yet.

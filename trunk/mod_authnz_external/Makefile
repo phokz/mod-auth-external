@@ -14,7 +14,7 @@ install: mod_authnz_external.la
 
 build: mod_authnz_external.la
 
-mod_authnz_external.la: 
+mod_authnz_external.la: mod_authnz_external.c
 	$(APXS) -c mod_authnz_external.c
 
 clean:

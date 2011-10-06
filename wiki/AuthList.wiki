@@ -15,7 +15,7 @@ Several small dummy external authentication programs written in Perl. These are 
 
 <dt>`auth-mysql`</dt>
 <dd>
-A external authenticator for authenticating out of a MySQL database. Written in Perl using the DBI/DBD library, so it is easily adapted to any other SQL server.
+A external authenticator for authenticating out of a MySQL database. Written in Perl using the DBI/DBD library, so it is easily adapted to any other SQL server. (These days, using Apache's mod_authn_dbd is probably a better choice for most appications.)
 
 *Author and Maintainer*: [http://anders.fix.no/software/#unix Anders Nordby]
 

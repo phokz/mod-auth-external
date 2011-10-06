@@ -7,10 +7,10 @@ Before installing, note the following:
   *  These instructions are for the current version of `mod_authnz_external`.  The installation procedure for older versions is very similar, and is documented in the INSTALLATION file included in the distribution.
 
   *  Make sure that you are using the correct version of `mod_auth_external` for you version of Apache:
-    || Apache 2.4 || mod_authnz_external-3.3.x ||
-    || Apache 2.2 || mod_authnz_external-3.1.x or mod_authnz_external-3.2.x ||
-    || Apache 2.0 || mod_auth_external-2.2.x ||
-    || Apache 1.3 || mod_auth_external-2.1.x ||
+|| Apache 2.4 || mod_authnz_external-3.3.x ||
+|| Apache 2.2 || mod_authnz_external-3.1.x or mod_authnz_external-3.2.x ||
+|| Apache 2.0 || mod_auth_external-2.2.x ||
+|| Apache 1.3 || mod_auth_external-2.1.x ||
 
     You can check your apache version by running it from the command line with the -v flag.
 

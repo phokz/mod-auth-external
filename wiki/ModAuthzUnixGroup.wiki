@@ -9,6 +9,11 @@
 
 `Mod_Authz_Unixgroup` is a unix group access control module for Apache 2.1 and later. If you are having users authenticate with real Unix login ID over the net, using something like my [http://code.google.com/p/mod-auth-external mod_authnz_external] / [http://code.google.com/p/pwauth pwauth\] combination, and you want to do access control based on unix group membership, then `mod_authz_unixgroup` is exactly what you need.
 
+There are different versions of mod_authz_unixgroup for different Apache releases:
+|| Apache 2.2 || Mod_authz_unixgroup 1.0.x ||
+|| Apache 2.4 || Mod_authz_unixgroup 1.1.x ||
+The configuration commands for these two versions are quite different.
+
 Let's say you are doing unix passwd file authentication with `mod_authnz_external` and `pwauth`. Your `.htaccess` file for a protected directory would probably start with the following directives:
 {{{
 AuthType Basic
@@ -17,9 +22,14 @@ AuthBasicProvider external
 AuthExternal pwauth
 }}}
 That would cause `mod_auth_basic` and `mod_authnz_external` to do authentication based on the Unix `passwd` database. `Mod_Authz_Unixgroup` would come into play if you wanted to further restrict access to specific Unix groups. You might append the following directives:
+*Apache 2.2:*
 {{{
 AuthzUnixgroup on
 Require group staff admin
+}}}
+*Apache 2.4:*
+{{{
+Require unix-group staff admin
 }}}
 This would allow only access to accounts in the '`staff`' or '`admin`' unix groups. You can alternately specify groups by their gid numbers instead of their names.
 

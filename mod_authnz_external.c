@@ -119,7 +119,9 @@ typedef struct
     apr_array_header_t *auth_name; /* Auth keyword for current dir */
     char *group_name;		 /* Group keyword for current dir */
     char *context;		 /* Context string from AuthExternalContext */
+    int  authoritative;		 /* Are we authoritative in current dir? */
     int  groupsatonce;		 /* Check all groups in one call in this dir? */
+    char *grouperror;		 /* What to return if group auth fails */
 
 } authnz_external_dir_config_rec;
 
@@ -134,9 +136,6 @@ typedef struct
 
 } authnz_external_svr_config_rec;
 
-
-/* A handle for retrieving the requested file's group from mod_authnz_owner */
-APR_DECLARE_OPTIONAL_FN(char*, authz_owner_get_file_group, (request_rec *r));
 
 /*
  * Creators for per-dir and server configurations.  These are called
@@ -153,7 +152,9 @@ static void *create_authnz_external_dir_config(apr_pool_t *p, char *d)
     dir->auth_name= apr_array_make(p,2,sizeof(const char *));	/* no default */
     dir->group_name= NULL;	/* no default */
     dir->context= NULL;		/* no default */
+    dir->authoritative= 1;	/* strong by default */
     dir->groupsatonce= 1;	/* default to on */
+    dir->grouperror= NULL;	/* default to 401 */
     return dir;
 }
 
@@ -349,12 +350,31 @@ static const command_rec authnz_external_cmds[] =
 	RSRC_CONF,
 	"a keyword followed by the method by which the data is passed"),
 
+    AP_INIT_FLAG("GroupExternalAuthoritative",
+	ap_set_flag_slot,
+	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, authoritative),
+	OR_AUTHCFG,
+	"Set to 'off' to allow access control to be passed along to lower "
+	    "modules if this module can't confirm access rights" ),
+
+    AP_INIT_FLAG("AuthzExternalAuthoritative",
+	ap_set_flag_slot,
+	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, authoritative),
+	OR_AUTHCFG,
+	"Old version of 'GroupExternalAuthoritative'" ),
+
     AP_INIT_TAKE1("AuthExternalContext",
 	ap_set_string_slot,
 	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, context),
 	OR_AUTHCFG,
 	"An arbitrary context string to pass to the authenticator in the "
 	ENV_CONTEXT " environment variable"),
+
+    AP_INIT_TAKE1("GroupExternalError",
+	ap_set_string_slot,
+	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, grouperror),
+	OR_AUTHCFG,
+	"HTTP error code to return when group authentication fails"),
 
     AP_INIT_FLAG("GroupExternalManyAtOnce",
 	ap_set_flag_slot,
@@ -624,8 +644,7 @@ static int exec_hardcode(const request_rec *r, const char *extpath,
 }
 
 
-static authz_status externalgroup_check_authorization(request_rec *r,
-	const char *require_args, const void *parsed_require_args)
+static int authz_external_check_user_access(request_rec *r)
 {
     authnz_external_dir_config_rec *dir= (authnz_external_dir_config_rec *)
 	ap_get_module_config(r->per_dir_config, &authnz_external_module);
@@ -633,104 +652,100 @@ static authz_status externalgroup_check_authorization(request_rec *r,
     authnz_external_svr_config_rec *svr= (authnz_external_svr_config_rec *)
 	ap_get_module_config(r->server->module_config, &authnz_external_module);
 
-    char *user= r->user;
-    char *extname= dir->group_name;
+    int i, code, ret;
+    int m= r->method_number;
     const char *extpath, *extmethod;
+    char *extname= dir->group_name;
+    int required_group= 0;
     const char *t, *w;
-    int code;
-
-    /* If no authenticated user, pass */
-    if ( !user ) return AUTHZ_DENIED_NO_USER;
+    const apr_array_header_t *reqs_arr= ap_requires(r);
+    const char *filegroup= NULL;
+    require_line *reqs;
 
     /* If no external authenticator has been configured, pass */
-    if ( !extname ) return AUTHZ_DENIED;
+    if ( !extname ) return DECLINED;
 
-    /* Get the path and method associated with that external */
-    if (!(extpath= apr_table_get(svr->group_path, extname)) ||
-	!(extmethod= apr_table_get(svr->group_method,extname)))
-    {
-	errno= 0;
-	ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
-	    "invalid GroupExternal keyword (%s)", extname);
-	return AUTHZ_DENIED;
-    }
+    /* If there are no Require arguments, pass */
+    if (!reqs_arr) return DECLINED;
+    reqs=  (require_line *)reqs_arr->elts;
 
-    if (dir->groupsatonce)
+
+    /* Loop through the "Require" argument list */
+    for(i= 0; i < reqs_arr->nelts; i++)
     {
-	/* Pass rest of require line to authenticator */
-	code= exec_external(extpath, extmethod, r, ENV_GROUP, require_args);
-	if (code == 0) return AUTHZ_GRANTED;
-    }
-    else
-    {
-	/* Call authenticator once for each group name on line */
-	t= require_args;
-	while ((w= ap_getword_conf(r->pool, &t)) && w[0])
+	if (!(reqs[i].method_mask & (AP_METHOD_BIT << m))) continue;
+
+	t= reqs[i].requirement;
+	w= ap_getword_white(r->pool, &t);
+
+	/* The 'file-group' directive causes mod_authz_owner to store the
+	 * group name of the file we are trying to access in a note attached
+	 * to the request.  It's our job to decide if the user actually is
+	 * in that group.  If the note is missing, we just decline.
+	 */
+	if ( !strcasecmp(w, "file-group"))
 	{
-	    code= exec_external(extpath, extmethod, r, ENV_GROUP, w);
-	    if (code == 0) return AUTHZ_GRANTED;
+	    filegroup= apr_table_get(r->notes, AUTHZ_GROUP_NOTE);
+	    if (filegroup == NULL) continue;
+	}
+
+	if( !strcmp(w,"group") || filegroup != NULL)
+	{
+	    required_group= 1;
+
+	    if (t[0] || filegroup != NULL)
+	    {
+		/* Get the path and method associated with that external */
+		if (!(extpath= apr_table_get(svr->group_path, extname)) ||
+		    !(extmethod= apr_table_get(svr->group_method,
+			    extname)))
+		{
+		    errno= 0;
+		    ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
+		    	"invalid GroupExternal keyword (%s)", extname);
+		    ap_note_basic_auth_failure(r);
+		    return HTTP_INTERNAL_SERVER_ERROR;
+		}
+
+		if (filegroup != NULL)
+		{
+		    /* Check if user is in the group that owns the file */
+		    code= exec_external(extpath, extmethod, r, ENV_GROUP,
+			    filegroup);
+		    if (code == 0) return OK;
+		}
+		else if (dir->groupsatonce)
+		{
+		    /* Pass rest of require line to authenticator */
+		    code= exec_external(extpath, extmethod, r, ENV_GROUP, t);
+		    if (code == 0) return OK;
+		}
+		else
+		{
+		    /* Call authenticator once for each group name on line */
+		    do {
+		        w= ap_getword_conf(r->pool, &t);
+			code= exec_external(extpath,
+				extmethod, r, ENV_GROUP, w);
+			if (code == 0) return OK;
+		    } while(t[0]);
+		}
+	    }
 	}
     }
 
-    ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
-	"Authorization of user %s to access %s failed. "
-	"User not in Required group.",
-    	r->user, r->uri);
-
-    return AUTHZ_DENIED;
-}
-
-APR_OPTIONAL_FN_TYPE(authz_owner_get_file_group) *authz_owner_get_file_group;
-
-static authz_status externalfilegroup_check_authorization(request_rec *r,
-	const char *require_args, const void *parsed_require_args)
-{
-    authnz_external_dir_config_rec *dir= (authnz_external_dir_config_rec *)
-	ap_get_module_config(r->per_dir_config, &authnz_external_module);
-
-    authnz_external_svr_config_rec *svr= (authnz_external_svr_config_rec *)
-	ap_get_module_config(r->server->module_config, &authnz_external_module);
-
-    char *user= r->user;
-    char *extname= dir->group_name;
-    const char *extpath, *extmethod;
-    const char *filegroup= NULL;
-    const char *t, *w;
-    int code;
-
-    /* If no authenticated user, pass */
-    if ( !user ) return AUTHZ_DENIED_NO_USER;
-
-    /* If no external authenticator has been configured, pass */
-    if ( !extname ) return AUTHZ_DENIED;
-
-    /* Get the path and method associated with that external */
-    if (!(extpath= apr_table_get(svr->group_path, extname)) ||
-	!(extmethod= apr_table_get(svr->group_method,extname)))
-    {
-	errno= 0;
-	ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
-	    "invalid GroupExternal keyword (%s)", extname);
-	return AUTHZ_DENIED;
-    }
-
-    /* Get group name for requested file from mod_authz_owner */
-    filegroup= authz_owner_get_file_group(r);
-
-    if (!filegroup)
-	/* No errog log entry, because mod_authz_owner already made one */
-	return AUTHZ_DENIED;
-
-    /* Pass the group to the external authenticator */
-    code= exec_external(extpath, extmethod, r, ENV_GROUP, filegroup);
-    if (code == 0) return AUTHZ_GRANTED;
+    /* If we didn't see a 'require group' or aren't authoritive, decline */
+    if (!required_group || !dir->authoritative)
+	return DECLINED;
 
     ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
-	"Authorization of user %s to access %s failed. "
-	"User not in Required file group (%s).",
-    	r->user, r->uri, filegroup);
+    	"access to %s failed, reason: user %s not allowed access (%s)",
+    	r->uri, r->user, dir->grouperror);
 
-    return AUTHZ_DENIED;
+    ap_note_basic_auth_failure(r);
+
+    return (dir->grouperror && (ret= atoi(dir->grouperror)) > 0) ? ret :
+    	HTTP_UNAUTHORIZED;
 }
 
 
@@ -816,40 +831,18 @@ static const authn_provider authn_external_provider =
 #endif
 };
 
-static const authz_provider authz_externalgroup_provider =
-{
-    &externalgroup_check_authorization,
-    NULL,
-};
-
-static const authz_provider authz_externalfilegroup_provider =
-{
-    &externalfilegroup_check_authorization,
-    NULL,
-};
 
 static void register_hooks(apr_pool_t *p)
 {
-    /* Get a handle on mod_authz_owner */
-    authz_owner_get_file_group = APR_RETRIEVE_OPTIONAL_FN(authz_owner_get_file_group);
+    ap_register_provider(p, AUTHN_PROVIDER_GROUP, "external", "0",
+	    &authn_external_provider);
 
-    /* Register authn provider */
-    ap_register_auth_provider(p, AUTHN_PROVIDER_GROUP, "external",
-	    AUTHN_PROVIDER_VERSION,
-	    &authn_external_provider, AP_AUTH_INTERNAL_PER_CONF);
-
-    /* Register authz providers */
-    ap_register_auth_provider(p, AUTHZ_PROVIDER_GROUP, "external-group",
-	    AUTHZ_PROVIDER_VERSION,
-	    &authz_externalgroup_provider, AP_AUTH_INTERNAL_PER_CONF);
-
-    ap_register_auth_provider(p, AUTHZ_PROVIDER_GROUP, "external-file-group",
-	    AUTHZ_PROVIDER_VERSION,
-	    &authz_externalfilegroup_provider, AP_AUTH_INTERNAL_PER_CONF);
+    ap_hook_auth_checker(authz_external_check_user_access, NULL, NULL,
+	    APR_HOOK_MIDDLE);
 }
 
 
-AP_DECLARE_MODULE(authnz_external) = {
+module AP_MODULE_DECLARE_DATA authnz_external_module = {
     STANDARD20_MODULE_STUFF,
     create_authnz_external_dir_config,	  /* create per-dir config */
     NULL,			  /* merge per-dir config - dflt is override */

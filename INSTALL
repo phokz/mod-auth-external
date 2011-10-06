@@ -1,5 +1,5 @@
                 How To Install mod_authnz_external.c
-		           Version 3.3.x
+		           Version 3.2.6
 
 NOTES:
 
@@ -7,9 +7,10 @@ NOTES:
    in the INSTALL.HARDCODE file in this directory before following these
    instructions.
 
- * These instructions are for Apache version 2.4.  This version of
+ * These instructions are for Apache version 2.2.  This version of
    mod_authnz_external will not work with older versions of Apache.
-   Other versions are available for different releases of Apache:
+   It will not work with Apache 2.4.  Other versions are available for
+   different releases of Apache:
 
      Apache 1.3   mod_auth_external-2.1.x
      Apache 2.0   mod_auth_external-2.2.x
@@ -438,7 +439,7 @@ instructions to your server configuration.
 	AuthBasicProvider external
 	AuthExternal <keyword>
 	GroupExternal <groupkeyword>
-	Require external-group <groupname1> <groupname2> ...
+	Require group <groupname1> <groupname2> ...
 
     Here <groupkeyword> matches a name you defined with with the 
     DefineExternalGroup or AddExternalGroup command in step 2.
@@ -463,7 +464,7 @@ instructions to your server configuration.
     owns the file being accessed, you can configure an external group
     checker and then install mod_authz_owner and do:
 
-        Require external-file-group
+        Require file-group
 
     The GroupExternal cannot (yet?) be used with multiple external
     authenticators.
@@ -481,30 +482,58 @@ instructions to your server configuration.
 
     * MODIFYING ERROR CODES FOR GROUP CHECKING:
 
-    Normally, if a group authentication fails, then apache will return a
-    401 error, which will normally cause the browser to pop up a fresh
-    login box so the user can try logging in with a different ID.  This
-    may not always be appropriate.  If you rejected him because he has a
-    blocked IP address, returning a 403 error, which displays an error
-    page (which you can configure) may be a better choice than asking him
-    to endlessly try new logins and passwords.
+    Normally, if a group authentication fails, then mod_authnz_external
+    will return a 401 error, which will normally cause the browser to
+    pop up a fresh login box so the user can try logging in with a different
+    ID.  This may not always be appropriate.  If you rejected him because he
+    has a blocked IP address, returning a 403 error, which displays an error
+    page (which you can configure) may be a better choice.  To get a
+    403 error instead of a 401 error on failed group access checks, you
+    would add the following command to your configuration:
 
-    Previous versions of mod_authnz_external had a 'GroupExternalError'
-    directive that allowed you to change this. This no longer exists
-    Under Apache 2.4 you can control the return code using the
-    'AuthzSendForbiddenOnFailure' directive.
+       GroupExternalError 403
+
+    This would effect only group checks, never password checks.  Bad
+    passwords always result in a 401 error.
 
     * INTERACTIONS WITH OTHER AUTHENTICATORS:
 
-    Previous versions of mod_authnz_external had 'GroupExternalAuthoritative'
-    directive. In Apache 2.4, the notion of authoritativeness is
-    thankfully almost entirely gone, so this directive is too.
-    
+    It is possible to configure more than one different authentication
+    module.  If you do so, you will normally want to make them
+    unauthoritative, so that if one fails, the others will be tried.
+    That way, authentication or access will be granted if ANY of the
+    the configured modules finds it valid.
+
+    If all your password checkers are "authn" modules running under
+    mod_auth_basic, then you need do nothing.  The arbitration among
+    such modules is different than the arbitration between top level
+    modules, and does the right thing by default.  But if some are not
+    "authn" modules, then you'll want to make mod_auth basic
+    unauthoritative with the "AuthBasicAuthoritative off" directive
+    described in the Apache manual.
+
+    If you have multiple group checkers, then you will need to make
+    mod_authnz_external un-authoritative for group checking.  To do
+    this, use the directive:
+
+	GroupExternalAuthoritative off
+
+    Of course, you'll probably also have to make the other module
+    unauthoritative.  For example, if you have a "Require user pete"
+    directive and a "Require group admin" directive and expect it to
+    allow either pete or any admin to login, then you need to make
+    mod_authz_user unauthoritative, because that's what checks
+    "Require user" directives.
+
+    See the Apache manual pages on AuthType, AuthName, AuthBasicProvider,
+    Require, and AuthGroupFile for more information.
+
     * OLD DIRECTIVES
 
     Some of the directives mentioned above used to have different names.
-    One old name still works for backward compatibility.
+    The old names still work for backward compatibility.
 
+    	AuthzExternalAuthoritative    equals   GroupExternalAuthoritative
 	AuthExternalGroupsAtOnce      equals   GroupExternalManyAtOnce
 
 (4) Install the Authenticator

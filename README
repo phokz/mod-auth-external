@@ -1,4 +1,4 @@
-                   Mod_Authnz_External version 3.3.x
+                   Mod_Authnz_External version 3.2.6
 
      Original Coder: Nathan Neulinger <nneul@umr.edu>
 Previous Maintainer: Tyler Allison    <allison@nas.nasa.gov>
@@ -18,14 +18,11 @@ caution.
 Versions:
 ---------
 
-Mod_authnz_external version 3.3.x is designed for use with Apache version
-2.4.x.  It will not work with Apache 2.2 or 2.0.  For older versions of
-Apache you will need older branches of mod_authnz_external:
-
-     Apache 1.3   mod_auth_external-2.1.x
-     Apache 2.0   mod_auth_external-2.2.x
-     Apache 2.2   mod_authnz_external-3.1.x or mod_authnz_external-3.2.x
-     Apache 2.4   mod_authnz_external-3.3.x
+Mod_authnz_external version 3.2.x is designed for use with Apache version
+2.2.x.  It will not work with Apache 2.0 or Apache 2.4.  For Apache 2.4,
+you need mod_authnz_external 3.3.x. If you have an older version of Apache,
+use instead either mod_auth_external-2.1.x for Apache 1.3, or
+mod_auth_external-2.2.x for Apache 2.2.
 
 This module was developed from "mod_auth_external".  It has been restructured
 to fit into the authn/authz structure introduce in Apache 2.1.  It can be used

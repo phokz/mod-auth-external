@@ -1,12 +1,3 @@
-v3.3.0   (Jan Wolter - Oct 6, 2011)
-----------------------------------------------
- * Revised to work with Apache 2.3 / 2.4.  Will not work with previous Apache
-   versions.
- * Deleted 'GroupExternalAuthoritative' and 'AuthzExternalAuthoritative'
-   directives which are obsolete.
- * Deleted 'GroupExternalError' directive which is superceded by Apache's
-   'AuthzSendForbiddenOnFailure' directive.
-
 v3.2.6   (Jan Wolter - Oct 6, 2011)
 -----------------------------------------------
  * Modified parsing of "Require groups" line so that you can have group

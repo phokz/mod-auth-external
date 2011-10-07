@@ -71,6 +71,7 @@
 #define APR_WANT_STRFUNC
 #include "apr_want.h"
 #include "apr_strings.h"
+#include "apr_sha1.h"
 
 #include "httpd.h"
 #include "http_config.h"
@@ -119,7 +120,8 @@ typedef struct
     apr_array_header_t *auth_name; /* Auth keyword for current dir */
     char *group_name;		 /* Group keyword for current dir */
     char *context;		 /* Context string from AuthExternalContext */
-    int  groupsatonce;		 /* Check all groups in one call in this dir? */
+    int  groupsatonce;		 /* Check all groups in one call? */
+    int  providecache;		 /* Provide auth data to mod_authn_socache? */
 
 } authnz_external_dir_config_rec;
 
@@ -135,28 +137,31 @@ typedef struct
 } authnz_external_svr_config_rec;
 
 
-/* A handle for retrieving the requested file's group from mod_authnz_owner */
+/* mod_authz_owner's function for retrieving the requested file's group */
 APR_DECLARE_OPTIONAL_FN(char*, authz_owner_get_file_group, (request_rec *r));
+APR_OPTIONAL_FN_TYPE(authz_owner_get_file_group) *authz_owner_get_file_group;
 
-/*
- * Creators for per-dir and server configurations.  These are called
+/* mod_authn_socache's function for adding credentials to its cache */
+static APR_OPTIONAL_FN_TYPE(ap_authn_cache_store) *authn_cache_store = NULL;
+
+
+/* Creators for per-dir and server configurations.  These are called
  * via the hooks in the module declaration to allocate and initialize
  * the per-directory and per-server configuration data structures declared
- * above.
- */
+ * above. */
 
 static void *create_authnz_external_dir_config(apr_pool_t *p, char *d)
 {
     authnz_external_dir_config_rec *dir= (authnz_external_dir_config_rec *)
 	apr_palloc(p, sizeof(authnz_external_dir_config_rec));
 
-    dir->auth_name= apr_array_make(p,2,sizeof(const char *));	/* no default */
+    dir->auth_name= apr_array_make(p,2,sizeof(const char *)); /* no default */
     dir->group_name= NULL;	/* no default */
     dir->context= NULL;		/* no default */
     dir->groupsatonce= 1;	/* default to on */
+    dir->providecache= 0;	/* default to off */
     return dir;
 }
-
 
 static void *create_authnz_external_svr_config( apr_pool_t *p, server_rec *s)
 {
@@ -172,10 +177,7 @@ static void *create_authnz_external_svr_config( apr_pool_t *p, server_rec *s)
     return (void *)svr;
 }
 
-/*
- * Handler for a DefineExternalAuth server config line
- */
-
+/* Handler for a DefineExternalAuth server config line */
 static const char *def_extauth(cmd_parms *cmd, void *dummy, const char *keyword,
 				const char *method, const char *path)
 {
@@ -190,10 +192,7 @@ static const char *def_extauth(cmd_parms *cmd, void *dummy, const char *keyword,
 }
 
 
-/*
- * Handler for a DefineExternalGroup server config line
- */
-
+/* Handler for a DefineExternalGroup server config line */
 static const char *def_extgroup(cmd_parms *cmd, void *dummy,
 	const char *keyword, const char *method, const char *path)
 {
@@ -209,11 +208,8 @@ static const char *def_extgroup(cmd_parms *cmd, void *dummy,
 
 
 
-/*
- * Handler for a AddExternalAuth server config line - add a external auth
- * type to the server configuration
- */
-
+/* Handler for a AddExternalAuth server config line - add a external auth
+ * type to the server configuration */
 static const char *add_extauth(cmd_parms *cmd, void *dummy, const char *keyword,
 				const char *path)
 {
@@ -228,11 +224,8 @@ static const char *add_extauth(cmd_parms *cmd, void *dummy, const char *keyword,
 }
 
 
-/*
- * Handler for a AddExternalGroup server config line - add a external group
- * type to the server configuration
- */
-
+/* Handler for a AddExternalGroup server config line - add a external group
+ * type to the server configuration */
 static const char *add_extgroup(cmd_parms *cmd, void *dummy,
 			 	const char *keyword, const char *path)
 {
@@ -246,13 +239,10 @@ static const char *add_extgroup(cmd_parms *cmd, void *dummy,
     return NULL;
 }
 
-/*
- * Handler for a SetExternalAuthMethod server config line - change an external
- * auth method in the server configuration
- */
-
+/* Handler for a SetExternalAuthMethod server config line - change an external
+ * auth method in the server configuration */
 static const char *set_authnz_external_method(cmd_parms *cmd, void *dummy,
-					const char *keyword, const char *method)
+				    const char *keyword, const char *method)
 {
     authnz_external_svr_config_rec *svr= (authnz_external_svr_config_rec *)
 	ap_get_module_config( cmd->server->module_config,
@@ -264,13 +254,10 @@ static const char *set_authnz_external_method(cmd_parms *cmd, void *dummy,
 }
 
 
-/*
- * Handler for a SetExternalGroupMethod server config line - change an external
- * group method in the server configuration
- */
-
+/* Handler for a SetExternalGroupMethod server config line - change an external
+ * group method in the server configuration */
 static const char *set_extgroup_method(cmd_parms *cmd, void *dummy,
-					const char *keyword, const char *method)
+				    const char *keyword, const char *method)
 {
     authnz_external_svr_config_rec *svr= (authnz_external_svr_config_rec *)
 	ap_get_module_config( cmd->server->module_config,
@@ -295,10 +282,7 @@ static const char *append_array_slot(cmd_parms *cmd, void *struct_ptr,
 }
 
 
-/*
- * Config file commands that this module can handle
- */
-
+/* Config file directives for this module */
 static const command_rec authnz_external_cmds[] =
 {
     AP_INIT_ITERATE("AuthExternal",
@@ -356,6 +340,12 @@ static const command_rec authnz_external_cmds[] =
 	"An arbitrary context string to pass to the authenticator in the "
 	ENV_CONTEXT " environment variable"),
 
+    AP_INIT_FLAG("AuthExternalProvideCache",
+	ap_set_flag_slot,
+	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, providecache),
+	OR_AUTHCFG,
+	"Should we forge authentication credentials for mod_authn_socache?"),
+
     AP_INIT_FLAG("GroupExternalManyAtOnce",
 	ap_set_flag_slot,
 	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, groupsatonce),
@@ -374,9 +364,7 @@ static const command_rec authnz_external_cmds[] =
 
 
 /* Called from apr_proc_create() if there are errors during launch of child
- * process.  Mostly just lifted from mod_cgi.
- */
-
+ * process.  Mostly just lifted from mod_cgi. */
 static void extchilderr(apr_pool_t *p, apr_status_t err, const char *desc)
 {
     apr_file_t *stderr_log;
@@ -387,8 +375,7 @@ static void extchilderr(apr_pool_t *p, apr_status_t err, const char *desc)
 }
 
 
-/*
- * Run an external authentication program using the given method for passing
+/* Run an external authentication program using the given method for passing
  * in the data.  The login name is always passed in.   Dataname is "GROUP" or
  * "PASS" and data is the group list or password being checked.  To launch
  * a detached daemon, run this with extmethod=NULL.
@@ -404,7 +391,6 @@ static void extchilderr(apr_pool_t *p, apr_status_t err, const char *desc)
  *   -4   apr_proc_wait() did not return a status code.  Should never happen.
  *   -5   apr_proc_wait() returned before child finished.  Should never happen.
  */
-
 static int exec_external(const char *extpath, const char *extmethod,
 		const request_rec *r, const char *dataname, const char *data)
 {
@@ -584,7 +570,6 @@ static int exec_external(const char *extpath, const char *extmethod,
  * into this source file, as well as inserting a call to them into this
  * routine.
  */
-
 static int exec_hardcode(const request_rec *r, const char *extpath,
 	const char *password)
 {
@@ -624,6 +609,8 @@ static int exec_hardcode(const request_rec *r, const char *extpath,
 }
 
 
+/* Handle a group check triggered by a 'Require external-group foo bar baz'
+ * directive. */
 static authz_status externalgroup_check_authorization(request_rec *r,
 	const char *require_args, const void *parsed_require_args)
 {
@@ -680,8 +667,9 @@ static authz_status externalgroup_check_authorization(request_rec *r,
     return AUTHZ_DENIED;
 }
 
-APR_OPTIONAL_FN_TYPE(authz_owner_get_file_group) *authz_owner_get_file_group;
 
+/* Handle a group check triggered by a 'Require external-file-group'
+ * directive. */
 static authz_status externalfilegroup_check_authorization(request_rec *r,
 	const char *require_args, const void *parsed_require_args)
 {
@@ -734,10 +722,35 @@ static authz_status externalfilegroup_check_authorization(request_rec *r,
 }
 
 
+/* Mod_authn_socache wants us to pass it the username and the encrypted
+ * password from the user database to cache. But we have no access to the
+ * actual user database - only the external authenticator can see that -
+ * and chances are, the passwords there aren't encrypted in any way that
+ * mod_authn_socache would understand anyway. So instead, after successful
+ * authentications only, we take the user's plain text password, encrypt
+ * that using an algorithm mod_authn_socache will understand, and cache that
+ * as if we'd actually gotten it from a password database.
+ */
+void mock_turtle_cache(request_rec *r, const char *plainpw)
+{
+    char cryptpw[120];
+
+    /* Authn_cache_store will be null if mod_authn_socache does not exist.
+     * If it does exist, but is not set up to cache us, then
+     * authn_cache_store() will do nothing, which is why we turn this off
+     * with "AuthExternalProvideCache Off" to avoid doing the encryption
+     * for no reason. */
+    if (authn_cache_store != NULL)
+    {
+	apr_sha1_base64(plainpw,strlen(plainpw),cryptpw);
+        authn_cache_store(r, "external", r->user, NULL, cryptpw);
+    }
+}
+
+
 /* Password checker for basic authentication - given a login/password,
  * check if it is valid.  Returns one of AUTH_DENIED, AUTH_GRANTED,
- * or AUTH_GENERAL_ERROR.
- */
+ * or AUTH_GENERAL_ERROR. */
 
 static authn_status authn_external_check_password(request_rec *r,
 	const char *user, const char *password)
@@ -780,7 +793,11 @@ static authn_status authn_external_check_password(request_rec *r,
 	    code= exec_external(extpath, extmethod, r, ENV_PASS, password);
 
 	/* If return code was zero, authentication succeeded */
-	if (code == 0) return AUTH_GRANTED;
+	if (code == 0)
+	{
+	    if (dir->providecache) mock_turtle_cache(r, password);
+	    return AUTH_GRANTED;
+	}
 
 	/* Log a failed authentication */
 	errno= 0;
@@ -796,7 +813,7 @@ static authn_status authn_external_check_password(request_rec *r,
 #if 0
 /* Password checker for digest authentication - given a login/password,
  * check if it is valid.  Returns one of AUTH_USER_FOUND, AUTH_USER_NOT_FOUND,
- * or AUTH_GENERAL_ERROR.   Not implemented at this time.
+ * or AUTH_GENERAL_ERROR.   Not implemented at this time and probably not ever.
  */
 
 auth_status *authn_external_get_realm_hash(request_rec *r, const char *user,
@@ -805,34 +822,51 @@ auth_status *authn_external_get_realm_hash(request_rec *r, const char *user,
 }
 #endif
 
+/* This is called after all modules have been initialized to acquire pointers
+ * to some functions from other modules that we would like to use if they are
+ * available. */
+static void opt_retr(void)
+{
+    /* Get authn_cache_store from mod_authn_socache */
+    authn_cache_store=
+	APR_RETRIEVE_OPTIONAL_FN(ap_authn_cache_store);
 
+    /* Get authz_owner_get_file_group from mod_authz_owner */
+    authz_owner_get_file_group=
+	APR_RETRIEVE_OPTIONAL_FN(authz_owner_get_file_group);
+}
+
+/* This tells mod_auth_basic and mod_auth_digest what to call for
+ * authentication. */
 static const authn_provider authn_external_provider =
 {
     &authn_external_check_password,
 #if 0
     &authn_external_get_realm_hash
 #else
-    NULL		/* No support for digest authentication at this time */
+    NULL	/* No support for digest authentication */
 #endif
 };
 
+/* This tells mod_auth_basic and mod_auth_digest what to call for
+ * access control with 'Require external-group' directives. */
 static const authz_provider authz_externalgroup_provider =
 {
     &externalgroup_check_authorization,
     NULL,
 };
 
+/* This tells mod_auth_basic and mod_auth_digest what to call for
+ * access control with 'Require external-file-group' directives. */
 static const authz_provider authz_externalfilegroup_provider =
 {
     &externalfilegroup_check_authorization,
     NULL,
 };
 
+/* Register this module with Apache */
 static void register_hooks(apr_pool_t *p)
 {
-    /* Get a handle on mod_authz_owner */
-    authz_owner_get_file_group = APR_RETRIEVE_OPTIONAL_FN(authz_owner_get_file_group);
-
     /* Register authn provider */
     ap_register_auth_provider(p, AUTHN_PROVIDER_GROUP, "external",
 	    AUTHN_PROVIDER_VERSION,
@@ -846,6 +880,9 @@ static void register_hooks(apr_pool_t *p)
     ap_register_auth_provider(p, AUTHZ_PROVIDER_GROUP, "external-file-group",
 	    AUTHZ_PROVIDER_VERSION,
 	    &authz_externalfilegroup_provider, AP_AUTH_INTERNAL_PER_CONF);
+
+    /* Ask for opt_retr() to be called after all modules have registered */
+    ap_hook_optional_fn_retrieve(opt_retr, NULL, NULL, APR_HOOK_MIDDLE);
 }
 
 

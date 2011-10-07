@@ -1,3 +1,8 @@
+v3.3.1   (Jan Wolter - )
+----------------------------------------------
+ * Added code to support caching authentications with mod_authn_socache.
+   This is enabled by the "AuthExternalProvideCache On" directive.
+
 v3.3.0   (Jan Wolter - Oct 6, 2011)
 ----------------------------------------------
  * Revised to work with Apache 2.3 / 2.4.  Will not work with previous Apache

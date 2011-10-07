@@ -468,6 +468,66 @@ instructions to your server configuration.
     The GroupExternal cannot (yet?) be used with multiple external
     authenticators.
 
+    * USE WITH MOD_AUTHN_SOCACHE
+
+    Mod_authnz_external version 3.3.1 and later can be used with the
+    Apache mod_authn_socache module, which caches authentications. If
+    you do this, then after a successful authentication, mod_socache
+    will remember the user for a settable time (5 minutes by default)
+    and not rerun the external authenticator again to check their password
+    until after the timeout.  This can be a very substantial performance
+    improvement.
+
+    It can also be a very substantial security problem.  One common use of
+    mod_authnz_external is to authenticate from databases that are not readable
+    by Apache, and should not be.  For example, if you are authenticating out
+    of the a unix password file with pwauth, you don't want make the password
+    file readable to Apache because then an Apache bug would risk exposing
+    your entire password file to the net. But if you turn on caching with
+    mod_authn_socache, then the cache it builds up is essentially an
+    Apache-readable copy of the most sensitive data from your password file.
+    With some settings, it may even be stored on disk rather than on memory.
+    The only good thing you can say for it is that all the passwords in that
+    cache will be encrypted (even if you are dopey enough not to encrypt them
+    in your actual password database). But encryption is a pretty weak
+    defense all by itself.
+
+    So using mod_authnz_external with mod_authn_socache might be dumb, but,
+    what the heck, when have we passed up a chance to give you more rope to
+    hang yourself with?
+
+    One note: normally when you use mod_authn_socache with one of the standard
+    Apache modules, a cache entry is created everytime it looks up a user's
+    password in the database, even if the password they submitted wasn't
+    the correct one.  With mod_authnz_external it only happens after
+    successful authentications. That's because mod_authnz_external doesn't
+    have direct access to the password database. After a successful
+    authentication we can fake-up something that looks to mod_authn_socache
+    like some credentials out of a database by simple encrypting the password
+    that the user sent us and pretending we got that out of a database. This
+    means we don't get quite the performance gains that mod_authn_socache
+    would give with something like mod_authn_dbd, but we get pretty close.
+
+    So here's how you do it. First you AuthBasicProvider statement should
+    list both 'socache' and 'external', and it's important that 'socache'
+    should be listed first, so that it tries to look up users in the cache
+    before mod_authnz_external runs the authenticator:
+
+       AuthBasicProvider socache external
+
+    Then you need to tell mod_authnz_external to start forging credentials
+    for mod_authn_socache:
+
+       AuthExternalProvideCache On
+
+    And you need to tell mod_authn_socache to accept credentials from
+    mod_authnz_external:
+
+       AuthnCacheProvideFor external
+
+    And that should do it. You should see many fewer runs of the external
+    authenticator, and perhaps a slight decline in your overall security.
+
     * PASSING CONTEXT INFORMATION INTO AUTHENTICATORS:
 
     If you want the authentication to work slightly differently in

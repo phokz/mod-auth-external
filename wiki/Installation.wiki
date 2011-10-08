@@ -62,4 +62,7 @@ This will create `mod_authnz_external.so` and copy it into the proper place, and
 
 === (4) Installation is Complete ===
 
-See the [Configuration] page for how to configure it.
+See the configuration page for you version of Apache:
+
+  * ConfigApache22 - Apache version 2.2
+  * ConfigApache24 - Apache version 2.3 or 2.4

@@ -261,4 +261,4 @@ Some of the directives mentioned above used to have different names. The old nam
 
         `AuthExternalGroupsAtOnce`      equals   `GroupExternalManyAtOnce`
 
-*Return to the [Installation] page for the rest of the setup procedure.*
+*Return to step (5) on the [Installation] page for the rest of the setup procedure.*

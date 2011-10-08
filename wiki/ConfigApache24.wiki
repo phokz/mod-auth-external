@@ -247,7 +247,7 @@ It is possible to configure more than one different authentication module. The a
 
 See the Apache manual pages on `mod_authn_basic` and `mod_authz_core` for more information.
 
-=== 3.6. Use with Mod_Authz_Socache ===
+=== 3.6. Use with !Mod_Authz_Socache ===
 
 Mod_authnz_external version 3.3.1 (currently available from svn only) and later can be used with the new Apache 2.4 mod_authn_socache module, which caches authentications. If you do this, then after a successful authentication, mod_socache will remember the user for a settable time (5 minutes by default) and not rerun the external authenticator again to check their password until after the timeout.  This can be a very substantial performance improvement.
 

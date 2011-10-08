@@ -2,7 +2,7 @@
 
 <wiki:toc max_depth="3" />
 
-*NOTE: These instructions are for configuration under Apache 2.2. If you are using Apache 2.3 or 2.4, please refer to the Configure24 page. For a summary of changes from Apache 2.2 to Apache 2.4 see the UpgradeTo24 page.*
+*NOTE: These instructions are for configuration under Apache 2.2. If you are using Apache 2.3 or 2.4, please refer to the Configuration24 page. For a summary of changes from Apache 2.2 to Apache 2.4 see the UpgradeTo24 page.*
 
 There are three parts to doing the configuration.  First, if you are using
 dynamic loading, you need to configure Apache to load the `mod_authnz_external`

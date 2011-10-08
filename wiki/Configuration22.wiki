@@ -91,7 +91,7 @@ SetExternalAuthMethod <keyword> <method>
 
  * *For the "function" method:* `<location>` is a string like "`<type>:<data>`".  The `<type>` part is a string that can be used to select from multiple internal functions.  `<data>` is a string passed to that function and is typically used as config file path.  The "`:`" is required even if the `<data>` is an empty string.
 
-In the old-style syntax, the path declaration should always preceed the method declaration, and the method declaration can be omitted if you want the default.
+In the old-style syntax, the path declaration should always precede the method declaration, and the method declaration can be omitted if you want the default.
 
 Here are some examples.  We give old-style syntax only for the first example, but it can be used in all cases:
 

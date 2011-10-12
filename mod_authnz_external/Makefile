@@ -3,8 +3,7 @@
 APXS=apxs
 
 TAR= README INSTALL INSTALL.HARDCODE CHANGES AUTHENTICATORS UPGRADE TODO \
-	mod_authnz_external.c mysql/* pwauth/* radius/* sybase/* test/* \
-	Makefile
+	mod_authnz_external.c test/* Makefile
 
 .DEFAULT_GOAL:= build
 .PHONY: install build clean

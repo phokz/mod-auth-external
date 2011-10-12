@@ -120,7 +120,7 @@ Security is generally less of a issue with group authenicators, since they are n
 
 In versions of `mod_auth_external` before 2.1.8, external authenticators were always passed just one group name.  If the Apache "`require group`" directive listed more than one group, then the external authenticator would be called once with each group name, which could be inefficient if you have a large number of groups.  `Mod_auth_external` will still behave this way if you issue the "`GroupExternalManyAtOnce off`" directive.
 
-Newer versions of `mod_auth_external` and `mod_authnz_external` will pass all group names, separated by spaces.  There will only be multiple calls if more than one "require group" directive applies to the same program (e.g., if different parent directories contain such directives in their `.htaccess` files - for efficiency, this should be avoided).  The list of group names is passed in exactly as they appear on the "require group" directive - if your program can't handle multiple spaces between group names, don't put them there.
+Newer versions of `mod_auth_external` and `mod_authnz_external` will pass all group names, separated by spaces.  There will only be multiple calls if more than one "require group" (or "require external-group" in Apache 2.4) directive applies to the same program (e.g., if different parent directories contain such directives in their `.htaccess` files - for efficiency, this should be avoided).  The list of group names is passed in exactly as they appear on the "require group" directive - if your program can't handle multiple spaces between group names, don't put them there.
 
 Arguments are passed in a manner similar to password authenticators.  The method used is determined by the '`SetExternalGroupMethod`' command in your Apache configuration file.
 
@@ -188,7 +188,7 @@ In the "environment" method, the arguments are passed in environment variables. 
 In all cases (pipe or environment method, password or group authentication), the following additional environment variables will be supplied to the authenticator:
 
 || AUTHTYPE || either "PASS" or "GROUP" depending on whether we are doing password or group authentication.  This is handy if you are using one program to do both. ||
-|| CONTEXT || a string whose value is set by an "AuthExternalContext" directive in the .htaccess file or "`<Directory>`" block for the directory.  This can be used to select different authentication behaviors in different directories.  It is undefined if there is no "AuthExternalContext" directive. ||
+|| CONTEXT || a string whose value is set by an "!AuthExternalContext" directive in the .htaccess file or "`<Directory>`" block for the directory.  This can be used to select different authentication behaviors in different directories.  It is undefined if there is no "!AuthExternalContext" directive. ||
 || IP || the client's ip-address. ||
 || HOST || the client's host name, if Apache has "`HostnameLookups` On". ||
 || PATH || the httpd's path environment variable. ||

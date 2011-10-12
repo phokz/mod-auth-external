@@ -1,10 +1,12 @@
-v3.3.1   (Jan Wolter - )
+v3.3.1   (Jan Wolter - Oct 12, 2012)
 ----------------------------------------------
  * Deleted most of the sample authenticators from the distribution. They
    are mostly old and crufty or available elsewhere. No need to clutter
    the main distribution with them.
  * Added code to support caching authentications with mod_authn_socache.
-   This is enabled by the "AuthExternalProvideCache On" directive.
+   This is enabled by the "AuthExternalProvideCache On" directive.  This
+   feature should be considered experimental, since mod_authn_socache still
+   seems buggy and it's interface may not have been finalized.
 
 v3.3.0   (Jan Wolter - Oct 6, 2011)
 ----------------------------------------------

@@ -21,6 +21,7 @@ Here are some relevant links.  See also the [AuthList list of available external
 </li>
 
 <li>[http://benow.ca/forum/News/Modification%20of%20mod-auth-external%20to%20enable%20authentication%20caching. Modification of mod-auth-external to enable authentication caching]. This is a branch of mod_authnz_external 3.2.5 modified to do authentication caching in module. It caches the username and IP address only, so until the timeout, further requests with the same IP address and username will be automatically accepted without running the external authenticator. I find it worrisome that those authentication requests will be accepted even if the password is not the same. At least that has the upside of not creating a less secure replica of your password database like mod_authn_socache sometimes does, but I can't say I'm very happy about it.  Note also that the cache is not in shared memory, so that each Apache process maintains its own cache, though it would still give a substantial performance boost. I'm inclined to think mod_authn_socache will be a better solution, when available, but I'm not entirely happy with either.
+</li>
 
 <li>[http://www.kernel.org/pub/linux/libs/pam/ PAM]. Portable Authentication Modules are libraries that have a common interface and can be linked to a program to do authentication out of different databases.  Linux, FreeBSD and Solaris support PAM.  OpenBSD does not.
 
@@ -39,6 +40,9 @@ The <a href="http://www.kernel.org/pub/linux/libs/pam/modules.html">list of PAM 
 </li>
 
 <li>[http://www.namazustudios.com/blog/checkpasswd-imap-a-mod_authnz_external-style-password-checker/ checkpassword-imap]. An IMAP authenticator written in Python for mod_auth_external that caches credentials for faster performance and so that you don't run up against rate limits on the IMAP server.
+</li>
+
+<li>[http://www.compassnetworks.com.au/?page=mod-auth-external BlueQuartz Authentication Script] seems to be an external authentication script for PAM written in Perl, similar to pwauth.  Seems to have some good security features, but I wasn't able to figure out how to get the source code.
 </li>
 </ul>
 

@@ -179,8 +179,8 @@ but there are more ways to screw up your security by doing them badly than
 we could possibly list.  See the file AUTHENTICATORS for more information
 on implementing authenticators.
 
-Example External Authentication Routines in this Distribution:
---------------------------------------------------------------
+Example Authentication Routines in this Distribution:
+-----------------------------------------------------
 
  test/
     Several small dummy external authentication programs written in Perl.
@@ -188,39 +188,44 @@ Example External Authentication Routines in this Distribution:
     any user whose password and login name are identical.  They write
     lots of debugging info to the error_log file.
 
-    Author and Maintainer:  Jan Wolter <janc@cyberspace.org>
+    Author and Maintainer:  Jan Wolter http://unixpapa.com/
 
- mysql/
+Example Authentication Routines Formerly Included in this Distribution:
+-----------------------------------------------------------------------
+In the interest of cleaning up the distribution, several other examples
+that were formerly distributed with this module are now only available
+separately.
+
+ pwauth
+    A C program for authenticating out of unix shadow password files or
+    PAM.
+
+    Author and Maintainer:  Jan Wolter http://unixpapa.com/
+    Available from: http://code.google.com/p/pwauth/
+
+ MYSQL-auth
     A Perl program for authenticating out of a MySQL database.  This is
     written in Perl using the DBI interface, so it could be trivially adapted
     to work with any other SQL database server that has a DBI interface
     (that is to say all of them).
 
     Author and Maintainer:  Anders Nordby <anders@fix.no>
-                            http://anders.fix.no/software/#unix
+    Available From: http://anders.fix.no/software/#unix
 
-The "pwauth" authenticator for unix shadow password files or PAM which
-was previously included in this distribution is now in a separate package,
-available from http://www.unixpapa.com/pwauth/.
+ sybase-internal-auth
+    An example of a hardcoded internal authentication function for use with
+    mod_auth_external or mod_authnz_external. It's designed for doing
+    authentication out of a sybase database, which these days would be better
+    done using mod_authn_dbd.
 
-Example Hardcoded Internal Authentication Routines in this Distribution:
-------------------------------------------------------------------------
+    Author: <br@ota.fr.socgen.com>
+    Available From: http://code.google.com/p/mod-auth-external/downloads
 
- sybase/
-    A function that queries a sybase database and compares the passwords
-    for said user.
+ mae-radius
+    Another example or a hardcoded internal authentication function.
+    This does radius authentication. It may not be fully open source.
 
-    Author:  <br@ota.fr.socgen.com>
-    Unmaintained.
-
-The radius client previously distributed with mod_auth_external has been
-removed from the distribution because of possible license problems.  Get it
-from http://unixpapa.com/software/mae_radius.tar.gz if you want it, but
-mod_auth_radius is a better choice.
-
-If you have programs or functions you have coded and would like to add them
-to the examples collection on the next release please email them to
-jan@unixpapa.com and include a short description.
+    Available From: http://unixpapa.com/software/mae_radius.tar.gz
 
 Checkpassword Authenticators
 ----------------------------

@@ -1,4 +1,4 @@
-v3.3.1   (Jan Wolter - Oct 12, 2012)
+v3.3.1   (Jan Wolter - Oct 12, 2011)
 ----------------------------------------------
  * Deleted most of the sample authenticators from the distribution. They
    are mostly old and crufty or available elsewhere. No need to clutter

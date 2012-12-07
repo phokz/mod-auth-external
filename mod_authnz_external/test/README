@@ -1,9 +1,11 @@
 These are dummy external authenticator programs used for testing
 mod_auth_external or mod_authnz_external.
 
-They are all Perl scripts.  Before using them, make sure that the
-#!/usr/bin/perl directives in the first lines give the correct pathname
-for the Perl interpretor on your system.
+They are mostly Perl scripts, and one PHP script.  Before using them, make
+sure that the directives on the first lines of each file:
+    #!/usr/bin/perl
+    #!/usr/bin/php
+give the correct pathname for the Perl and/or PHP interpretors on your system.
 
 The files are:
 
@@ -11,6 +13,8 @@ The files are:
    test.env         Dummy user authentication program using environment method
    testgroup.pipe   Dummy group check program using pipe method
    testgroup.env    Dummy group check program using environment method
+
+   test.pipe.php    PHP version of test.pipe
 
 The user authentication programs will accept a login if the user name
 matches the password, and will reject all others.
@@ -25,4 +29,5 @@ see what happens when you try an authentication.
 (Obviously you wouldn't want to log plain-text passwords in a real
 authentication program).
 
-Author & Maintainer:  Jan Wolter   http://www.unixpapa.com
+Author & Maintainer for Perl Versions:  Jan Wolter   http://www.unixpapa.com
+Author of PHP Version: Claus Andersen

@@ -1,3 +1,8 @@
+v3.3.2   (Jan Wolter - NOT YET RELEASED)
+----------------------------------------------
+ * Added test/test.pipe.php, a PHP version of test/test.pipe contributed
+   by Claus Andersen.
+
 v3.3.1   (Jan Wolter - Oct 12, 2011)
 ----------------------------------------------
  * Deleted most of the sample authenticators from the distribution. They

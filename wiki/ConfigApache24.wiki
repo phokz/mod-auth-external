@@ -30,7 +30,7 @@ so you can probably skip directly to step 2 and only come back to this if things
 don't seem to be working. If by some chance you are statically loading mod_authnz_external, then you also don't need to worry about any of this.
 
 <ol>
-<li>First, you should make sure that there is a proper "`LoadModule`" command in the httpd.conf file.  This should have been put there by '`apxs`' but, some older Linux distributions messed it up.  Basically, the 'LoadModule' command should look a lot like all the other `LoadModule` commands you'll find there.  Something like
+<li>First, you should make sure that there is a proper "`LoadModule`" command in the httpd.conf file.  This should have been put there by '`apxs`' but, some older Linux distributions messed it up.  Basically, the `LoadModule` command should look a lot like all the other `LoadModule` commands you'll find there.  Something like
 {{{
 LoadModule authnz_external_module modules/mod_authnz_external.so
 }}}

@@ -98,7 +98,7 @@ If it doesn't work, check the apache error logs.  They are loaded with helpful i
 
  * Apache complains about not recognizing `mod_authnz_external` commands in the `httpd.conf` file like "`DefineExternalAuth`" and "`AddExternalAuth`".
 
- Either the module didn't get installed (if you staticly linked the module, are you running the newly compiled copy of `httpd`?), or it isn't enabled (if it is dynamically linked, the `AddModule` and `LoadModule` commands described above in step (1) may be missing, incorrect, or commented out by an inappropriate `<IfDefine>`).
+ Either the module didn't get installed (if you staticly linked the module, are you running the newly compiled copy of `httpd`?), or it isn't enabled (if it is dynamically linked, the `AddModule` and `LoadModule` commands described on the configuration pages may be missing, incorrect, or commented out by an inappropriate `<IfDefine>`).
 
  Sometimes I've found that the `httpd.conf` file I've been editing is not actually the one being used by the copy of Apache that is running.  Sometimes I test this by inserting deliberately invalid commands and checking to see if error messages are generated when Apache is restarted.
 

@@ -107,7 +107,7 @@ AddExternalAuth archive_auth /usr/local/bin/authcheck
 SetExternalAuthMethod archive_auth pipe
 }}}
 
-_For external authentication programs using a pipe:_
+_For external authentication programs using environment variables:_
 {{{
 DefineExternalAuth archive_auth environment /usr/local/bin/authcheck
 }}}

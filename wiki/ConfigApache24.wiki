@@ -44,7 +44,7 @@ If you previously had `mod_authnz_external` or `mod_auth_external` installed and
 {{{
 AddModule mod_authnz_external.c
 }}}
-somewhere below "ClearModuleList" command (probably somewhere among dozens of other AddModule commands).  If you used 'apxs' to install mod_authnz_external, then this should already be done, but it may again be stashed in an inappropriate `<IfDefine>`.
+somewhere below "`ClearModuleList`" command (probably somewhere among dozens of other AddModule commands).  If you used 'apxs' to install mod_authnz_external, then this should already be done, but it may again be stashed in an inappropriate `<IfDefine>`.
 
 The standard Apache configuration files don't have a "`ClearModuleList`" command and don't need an "`AddModule`" command.  However the standard Redhat configuration files, among others, do.
 </li>

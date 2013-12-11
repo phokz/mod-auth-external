@@ -96,7 +96,6 @@
 #define ENV_HOST	"HOST"		/* Remote Host */
 #define ENV_HTTP_HOST	"HTTP_HOST"	/* Local Host */
 #define ENV_CONTEXT	"CONTEXT"	/* Arbitrary Data from Config */
-#define ENV_FORWARDS	"FORWARDS"
 /* Undefine this if you do not want cookies passed to the script */
 #define ENV_COOKIE	"COOKIE"
 
@@ -401,7 +400,7 @@ static int exec_external(const char *extpath, const char *extmethod,
     apr_procattr_t *procattr;
     apr_proc_t proc;
     apr_status_t rc= APR_SUCCESS;
-    char *child_env[13];
+    char *child_env[12];
     char *child_arg[MAX_ARG+2];
     const char *t;
     int i, status= -4;
@@ -424,7 +423,7 @@ static int exec_external(const char *extpath, const char *extmethod,
 
     if (!isdaemon)
     {
-	const char *cookie, *host, *remote_host, *forwards;
+	const char *cookie, *host, *remote_host;
 	authnz_external_dir_config_rec *dir= (authnz_external_dir_config_rec *)
 	    ap_get_module_config(r->per_dir_config, &authnz_external_module);
 	i= 0;
@@ -444,8 +443,8 @@ static int exec_external(const char *extpath, const char *extmethod,
 	if (remote_host != NULL)
 	    child_env[i++]= apr_pstrcat(p, ENV_HOST"=", remote_host,NULL);
 
-	if (c->remote_ip)
-	    child_env[i++]= apr_pstrcat(p, ENV_IP"=", c->remote_ip, NULL);
+	if (r->useragent_ip)
+	    child_env[i++]= apr_pstrcat(p, ENV_IP"=", r->useragent_ip, NULL);
 
 	if (r->uri)
 	    child_env[i++]= apr_pstrcat(p, ENV_URI"=", r->uri, NULL);
@@ -456,9 +455,6 @@ static int exec_external(const char *extpath, const char *extmethod,
 	if (dir->context)
 	    child_env[i++]= apr_pstrcat(r->pool, ENV_CONTEXT"=",
 	    	dir->context, NULL);
-
-	if ((forwards= apr_table_get(r->headers_in, "X-Forwarded-For")) != NULL)
-	    child_env[i++]= apr_pstrcat(p, ENV_FORWARDS"=", forwards, NULL);
 
 #ifdef ENV_COOKIE
 	if ((cookie= apr_table_get(r->headers_in, "Cookie")) != NULL)

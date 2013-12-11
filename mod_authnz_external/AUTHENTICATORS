@@ -249,7 +249,16 @@ OTHER ENVIRONMENT VARIABLES
 
     IP        the client's ip-address.
 
-    HOST      the client's host name, if Apache has "HostnameLookups On".
+    HOST      the host name corresponding to IP, if Apache has
+              "HostnameLookups On".
+
+    FORWARDS  If a load-balancer or proxy is being used, then the "IP" variable
+	      is just going to be the ip-address of the server that forwarded
+	      the client's request to the current server. In that case, the
+	      "FORWARDS" environment variable gives a comma-separated list of
+	      ip-addresses, the first of which will be the original client's ip,
+              while the rest are all the other proxies the request was forwarded
+              through before reaching the server named by the the "IP" variable.
 
     PATH      the httpd's path environment variable.
 

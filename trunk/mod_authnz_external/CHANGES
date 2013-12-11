@@ -1,9 +1,11 @@
-v3.3.2   (Jan Wolter - NOT YET RELEASED)
+v3.3.2   (Jan Wolter - Dec 11, 2013)
 ----------------------------------------------
- * Added the FORWARDS environment variable for use with load balancing servers.
-   This patch contributed by Rogier Slag.
+ * Fixed a bug with setting of GROUP environment variable. Thanks to
+   ddarbyson for reporting this, and Guoan Hu for posting the fix.
  * Added test/test.pipe.php, a PHP version of test/test.pipe contributed
    by Claus Andersen.
+ * Added the FORWARDS environment variable for use with load balancing servers.
+   This patch contributed by Rogier Slag.
 
 v3.3.1   (Jan Wolter - Oct 12, 2011)
 ----------------------------------------------

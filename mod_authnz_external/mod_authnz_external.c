@@ -202,7 +202,7 @@ static const char *def_extgroup(cmd_parms *cmd, void *dummy,
 	    &authnz_external_module);
 
     apr_table_set( svr->group_path,   keyword, path );
-    apr_table_set( svr->group_method, keyword, DEFAULT_METHOD );
+    apr_table_set( svr->group_method, keyword, method );
 
     return NULL;
 }

@@ -1,5 +1,7 @@
 v3.3.2   (Jan Wolter - NOT YET RELEASED)
 ----------------------------------------------
+ * Added the FORWARDS environment variable for use with load balancing servers.
+   This patch contributed by Rogier Slag.
  * Added test/test.pipe.php, a PHP version of test/test.pipe contributed
    by Claus Andersen.
 

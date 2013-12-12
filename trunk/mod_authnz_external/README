@@ -183,12 +183,14 @@ Example Authentication Routines in this Distribution:
 -----------------------------------------------------
 
  test/
-    Several small dummy external authentication programs written in Perl.
-    This are meant only for testing of mod_authnz_external.  They accept
-    any user whose password and login name are identical.  They write
-    lots of debugging info to the error_log file.
+    Several small dummy external authentication programs written in Perl
+    (there is also a PHP version of one of them). These are meant only for
+    testing of mod_authnz_external.  They accept any user whose password
+    and login name are identical.  They write lots of debugging info to
+    the error_log file.
 
     Author and Maintainer:  Jan Wolter http://unixpapa.com/
+    Author of PHP Version:  Claus Andersen
 
 Example Authentication Routines Formerly Included in this Distribution:
 -----------------------------------------------------------------------

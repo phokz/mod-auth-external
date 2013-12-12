@@ -54,6 +54,7 @@ NOTES:
 
      (1) You can statically link it with Apache.  This requires rebuilding
 	 Apache in such a way that mod_authnz_external will be compiled in. 
+         Nobody does this anymore.
 
      (2) You can make mod_authnz_external a dynamically loaded module.  If
 	 your Apache has been built to support dynamically loaded modules
@@ -465,7 +466,7 @@ instructions to your server configuration.
 
         Require external-file-group
 
-    The GroupExternal cannot (yet?) be used with multiple external
+    The GroupExternal directive cannot (yet?) be used with multiple external
     authenticators.
 
     * USE WITH MOD_AUTHN_SOCACHE
@@ -619,7 +620,8 @@ instructions to your server configuration.
 	not actually the one being used by the copy of Apache that is
 	running.  Sometimes I test this by inserting deliberately invalid
 	commands and checking to see if error messages are generated when
-	Apache is restarted.
+	Apache is restarted. We leave the choice of invalid command words
+        to be used to your imagination.
 
       - It displays pages in a protected directory without asking for
 	a login and password.
@@ -677,7 +679,7 @@ instructions to your server configuration.
 	crash.
 
       - Error log says "Failed (X) for user foo" with X being some number
-        other than 255 or -1.
+        other than -1, -2, 255 or 254.
       
 	The authenticator ran, and exited with the given non-zero return
 	code.  You'll have to check the authenticator to see under what

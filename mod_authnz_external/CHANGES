@@ -1,4 +1,4 @@
-v3.3.2   (Jan Wolter - Dec 11, 2013)
+v3.3.2   (Jan Wolter - Dec 12, 2013)
 ----------------------------------------------
  * Replaced reference to remote_ip field of the connection record with
    useragent_ip, due to the elimination of remote_ip in Apache 2.4.1. Thanks

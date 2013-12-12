@@ -20,7 +20,7 @@ clean:
 	rm -rf mod_authnz_external.so mod_authnz_external.o \
 	    mod_authnz_external.la mod_authnz_external.slo \
 	    mod_authnz_external.lo .libs
-	ls -a .*.swp
+	-ls -a .*.swp
 
 mae.tar: $(TAR)
 	tar cvf mae.tar $(TAR)

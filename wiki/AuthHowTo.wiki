@@ -23,6 +23,8 @@ You get points for paranoia.  Some notes:
 
   * Don't make any assumptions about the length of the login names and passwords given by the user.  I _think_ Apache will never pass you ones that are longer than 8192 characters, but don't depend this.  C programmers should check very carefully for buffer overflows.
 
+  * Don't make assumptions about the content of the login and password strings. For example, if you are using them in an SQL query, do proper checking and/or quoting to insure that nobody is doing SQL injection.
+
   * Think about locking.  It is possible to get lots of hits at your website very fast, so there may be many programs simultaneously reading your authentication database, plus updates may be going on at the same time. Probably some form of locking is needed to make all this work right.
 
   * If you are programming in C, think about core dumps.  On some systems core dump files can be publicly readable.  A core dump from your authenticator is likely to contain the user's plain text password, and may include large chunks of your password database that may have been in buffers.  For C programs on most versions of Unix, it is possible to disable core dumps by doing something like:

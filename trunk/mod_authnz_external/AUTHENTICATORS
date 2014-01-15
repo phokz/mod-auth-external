@@ -26,6 +26,10 @@ SECURITY
    that are longer than 8192 characters, but don't depend this.  Check very
    carefully for buffer overflows.
 
+ - Don't make assumptions about the content of the login and password strings.
+   For example, if you are using them in an SQL query, do proper checking
+   and/or quoting to insure that nobody is doing SQL injection.
+
  - Think about locking.  It is possible to get lots of hits at your website
    very fast, so there may be many programs simultaneously reading your
    authentication database, plus updates may be going on at the same time.

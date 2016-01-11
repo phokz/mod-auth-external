@@ -405,7 +405,9 @@ static int exec_external(const char *extpath, const char *extmethod,
     const char *t;
     int i, status= -4;
     apr_exit_why_e why= APR_PROC_EXIT;
+#ifndef _WINDOWS
     apr_sigfunc_t *sigchld;
+#endif
 
     /* Set various flags based on the execution method */
 
@@ -503,8 +505,11 @@ static int exec_external(const char *extpath, const char *extmethod,
     }
 
     /* Sometimes other modules wil mess up sigchild.  Need to fix it for
-     * the wait call to work correctly.  */
+     * the wait call to work correctly. (However, there's no need to fix
+     * the handler on Windows, since there are no signals on Windows.) */
+#ifndef _WINDOWS
     sigchld= apr_signal(SIGCHLD,SIG_DFL);
+#endif
 
     /* Start the child process */
     rc= apr_proc_create(&proc, child_arg[0],
@@ -546,7 +551,9 @@ static int exec_external(const char *extpath, const char *extmethod,
     rc= apr_proc_wait(&proc,&status,&why,APR_WAIT);
 
     /* Restore sigchild to whatever it was before we reset it */
+#ifndef _WINDOWS
     apr_signal(SIGCHLD,sigchld);
+#endif
 
     if (!APR_STATUS_IS_CHILD_DONE(rc))
     {

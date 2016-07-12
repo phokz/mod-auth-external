@@ -24,7 +24,7 @@ v3.3.0   (Jan Wolter - Oct 6, 2011)
    versions.
  * Deleted 'GroupExternalAuthoritative' and 'AuthzExternalAuthoritative'
    directives which are obsolete.
- * Deleted 'GroupExternalError' directive which is superceded by Apache's
+ * Deleted 'GroupExternalError' directive which is superseded by Apache's
    'AuthzSendForbiddenOnFailure' directive.
 
 v3.2.6   (Jan Wolter - Oct 6, 2011)
@@ -66,10 +66,10 @@ v3.2.3   (Jan Wolter - Feb 26, 2009)
 -----------------------------------------------
  * Added GroupExternalError directive, which allows you to specify the
    HTTP error code to be returned if the group access check fails.
-   Defaut is 401, but you may want to return 403 if you want to show the
+   Default is 401, but you may want to return 403 if you want to show the
    user an error page instead of asking him to login again.  Thanks to
    Peter Crawshaw <pcrawshaw@mta.ca> for this patch.
- * In hopes of getting to a more consistantly named set of directives,
+ * In hopes of getting to a more consistently named set of directives,
    added new aliases for two old directives:
       GroupExternalAuthoritative    alias for    AuthzExternalAuthoritative
       GroupExternalManyAtOnce       alias for    AuthExternalGroupsAtOnce

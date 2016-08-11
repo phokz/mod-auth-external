@@ -756,8 +756,8 @@ void mock_turtle_cache(request_rec *r, const char *plainpw)
 
 
 /* Password checker for basic authentication - given a login/password,
- * check if it is valid.  Returns one of AUTH_DENIED, AUTH_GRANTED,
- * or AUTH_GENERAL_ERROR. */
+ * check if it is valid.  Returns one of AUTH_DENIED, AUTH_GRANTED, 
+ * AUTH_USER_NOT_FOUND, or AUTH_GENERAL_ERROR. */
 
 static authn_status authn_external_check_password(request_rec *r,
 	const char *user, const char *password)
@@ -779,6 +779,8 @@ static authn_status authn_external_check_password(request_rec *r,
 	    "No AuthExternal name has been set");
 	return AUTH_GENERAL_ERROR;
     }
+
+    int all_not_found = 1;
 
     for (i= 0; i < dir->auth_name->nelts; i++)
     {
@@ -806,12 +808,27 @@ static authn_status authn_external_check_password(request_rec *r,
 	    return AUTH_GRANTED;
 	}
 
+    /* code 1 is 
+     * STATUS_UNKNOWN
+     * Nonexistant login or (for some configurations) incorrect password
+     * Handle this differently so that unknown users can be passed to the next
+     * Apache AuthBasicProvider */
+    if (code != 1)
+    {
+        all_not_found = 0;
+    }
+
 	/* Log a failed authentication */
 	errno= 0;
 	ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
 	    "AuthExtern %s [%s]: Failed (%d) for user %s",
 	    extname, extpath, code, r->user);
     }
+
+    if (all_not_found) {
+        return AUTH_USER_NOT_FOUND;
+    }
+
     /* If no authenticators succeed, refuse authentication */
     return AUTH_DENIED;
 }

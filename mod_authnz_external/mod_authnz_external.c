@@ -640,7 +640,7 @@ static authz_status externalgroup_check_authorization(request_rec *r,
     char *extname= dir->group_name;
     const char *extpath, *extmethod;
     const char *t, *w;
-    int code;
+    int code = 0;
 
     if (dir->authncheck){
         /* If no authenticated user, pass */
@@ -682,8 +682,8 @@ static authz_status externalgroup_check_authorization(request_rec *r,
 
     ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
 	"Authorization of user %s to access %s failed. "
-	"User not in Required group.",
-    	r->user, r->uri);
+	"User not in Required group. Last result code: %i",
+    	r->user, r->uri, code);
 
     return AUTHZ_DENIED;
 }
@@ -704,7 +704,6 @@ static authz_status externalfilegroup_check_authorization(request_rec *r,
     char *extname= dir->group_name;
     const char *extpath, *extmethod;
     const char *filegroup= NULL;
-    const char *t, *w;
     int code;
 
     if (dir->authncheck){

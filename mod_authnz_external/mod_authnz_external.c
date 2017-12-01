@@ -366,7 +366,7 @@ static const command_rec authnz_external_cmds[] =
 	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, authncheck),
 	OR_AUTHCFG,
 	"Set to 'off' if group authenticator should skip checking whether "
-			"user is validly authenticated"),
+        "user is validly authenticated"),
 
     { NULL }
 };
@@ -646,9 +646,9 @@ static authz_status externalgroup_check_authorization(request_rec *r,
         /* If no authenticated user, pass */
         if ( !user ) return AUTHZ_DENIED_NO_USER;
     }else{
-		/* Prevent crash due to missing user */
-		if ( !user ) r->user = "";
-	}
+        /* Prevent crash due to missing user */
+        if ( !user ) r->user = "";
+    }
 
     /* If no external authenticator has been configured, pass */
     if ( !extname ) return AUTHZ_DENIED;
@@ -710,9 +710,9 @@ static authz_status externalfilegroup_check_authorization(request_rec *r,
         /* If no authenticated user, pass */
         if ( !user ) return AUTHZ_DENIED_NO_USER;
     }else{
-		/* Prevent crash due to missing user */
-		if ( !user ) r->user = "";
-	}
+        /* Prevent crash due to missing user */
+        if ( !user ) r->user = "";
+    }
 
     /* If no external authenticator has been configured, pass */
     if ( !extname ) return AUTHZ_DENIED;

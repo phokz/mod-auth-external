@@ -57,5 +57,5 @@ Mod_authnz_external is available from:
 Pwauth is available from:
    http://code.google.com/p/pwauth/
 
-It might also be possible to use this with mod_auth_shadow, expecially if a
+It might also be possible to use this with mod_auth_shadow, especially if a
 authn/authz version of that is ever released.

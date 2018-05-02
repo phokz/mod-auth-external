@@ -63,7 +63,7 @@ NOTES:
 	 on dynamically loaded modules see http://www.apache.org/docs/dso.html
 
    Instructions for both options are given here.  The dynamic loading
-   option will probably be prefered on virtually all modern installations.
+   option will probably be preferred on virtually all modern installations.
 
  * There is also documentation in the README file and in the AUTHENTICATORS
    file.  If you find this document unclear, reading those may help.
@@ -303,7 +303,7 @@ instructions to your server configuration.
 	    typically used as config file path.  The ":" is required even if
 	    the <data> is an empty string.
 
-	In the old-style syntax, the path declaration should always preceed
+	In the old-style syntax, the path declaration should always preced
 	the method declaration, and the method declaration can be omitted if
 	you want the default.
 
@@ -624,7 +624,7 @@ instructions to your server configuration.
       - Apache complains about not recognizing mod_authnz_external commands
         in the httpd.conf file like "DefineExternalAuth" and "AddExternalAuth".
 
-	Either the module didn't get installed (if you staticly linked
+	Either the module didn't get installed (if you statically linked
 	the module, are you running the newly compiled copy of httpd?),
 	or it isn't enabled (if it is dynamically linked, the AddModule
 	LoadModule commands described above in step (1) may be missing,

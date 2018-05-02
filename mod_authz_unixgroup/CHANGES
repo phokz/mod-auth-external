@@ -34,7 +34,7 @@ v1.0.1   (Jan Wolter - Aug 6, 2008)
    Both of the above modifications are inspired by patches made by Ken Lalonde
    <ken at globalremit dot com>.
 
- * Included "http_request.h" header file to surpress a harmless compile-time
+ * Included "http_request.h" header file to suppress a harmless compile-time
    warning.
 
 v1.0.0   (Jan Wolter - Feb 19, 2006)

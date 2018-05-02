@@ -122,6 +122,7 @@ typedef struct
     char *context;		 /* Context string from AuthExternalContext */
     int  groupsatonce;		 /* Check all groups in one call? */
     int  providecache;		 /* Provide auth data to mod_authn_socache? */
+    int  authncheck;		 /* Check for previous authentication? */
 
 } authnz_external_dir_config_rec;
 
@@ -160,6 +161,7 @@ static void *create_authnz_external_dir_config(apr_pool_t *p, char *d)
     dir->context= NULL;		/* no default */
     dir->groupsatonce= 1;	/* default to on */
     dir->providecache= 0;	/* default to off */
+    dir->authncheck= 1;		/* default to on */
     return dir;
 }
 
@@ -358,6 +360,13 @@ static const command_rec authnz_external_cmds[] =
 	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, groupsatonce),
 	OR_AUTHCFG,
 	"Old version of 'GroupExternalManyAtOnce'" ),
+	
+	AP_INIT_FLAG("GroupExternalAuthNCheck",
+	ap_set_flag_slot,
+	(void *)APR_OFFSETOF(authnz_external_dir_config_rec, authncheck),
+	OR_AUTHCFG,
+	"Set to 'off' if group authenticator should skip checking whether "
+        "user is validly authenticated"),
 
     { NULL }
 };
@@ -631,10 +640,15 @@ static authz_status externalgroup_check_authorization(request_rec *r,
     char *extname= dir->group_name;
     const char *extpath, *extmethod;
     const char *t, *w;
-    int code;
+    int code = 0;
 
-    /* If no authenticated user, pass */
-    if ( !user ) return AUTHZ_DENIED_NO_USER;
+    if (dir->authncheck){
+        /* If no authenticated user, pass */
+        if ( !user ) return AUTHZ_DENIED_NO_USER;
+    }else{
+        /* Prevent crash due to missing user */
+        if ( !user ) r->user = "";
+    }
 
     /* If no external authenticator has been configured, pass */
     if ( !extname ) return AUTHZ_DENIED;
@@ -668,8 +682,8 @@ static authz_status externalgroup_check_authorization(request_rec *r,
 
     ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
 	"Authorization of user %s to access %s failed. "
-	"User not in Required group.",
-    	r->user, r->uri);
+	"User not in Required group. Last result code: %i",
+    	r->user, r->uri, code);
 
     return AUTHZ_DENIED;
 }
@@ -690,11 +704,15 @@ static authz_status externalfilegroup_check_authorization(request_rec *r,
     char *extname= dir->group_name;
     const char *extpath, *extmethod;
     const char *filegroup= NULL;
-    const char *t, *w;
     int code;
 
-    /* If no authenticated user, pass */
-    if ( !user ) return AUTHZ_DENIED_NO_USER;
+    if (dir->authncheck){
+        /* If no authenticated user, pass */
+        if ( !user ) return AUTHZ_DENIED_NO_USER;
+    }else{
+        /* Prevent crash due to missing user */
+        if ( !user ) r->user = "";
+    }
 
     /* If no external authenticator has been configured, pass */
     if ( !extname ) return AUTHZ_DENIED;

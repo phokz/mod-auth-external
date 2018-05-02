@@ -555,6 +555,19 @@ instructions to your server configuration.
     Under Apache 2.4 you can control the return code using the
     'AuthzSendForbiddenOnFailure' directive.
 
+    * USING GROUP CHECKING INDEPENDENT OF USER CHECKING:
+
+    Normally, the group authorization process checks that a user was 
+    successfully authenticated by the user authentication module before 
+    actually running the external group checking program.  This may be 
+    undesirable if your goal is to use mod_authz_external on its own as 
+    a group checker, without any user checking. You can use the 
+    following directive in your Apache config to disable the user 
+    authentication check:
+    
+    GroupExternalAuthNCheck Off
+    
+
     * INTERACTIONS WITH OTHER AUTHENTICATORS:
 
     Previous versions of mod_authnz_external had 'GroupExternalAuthoritative'

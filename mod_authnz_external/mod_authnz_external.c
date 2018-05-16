@@ -409,7 +409,7 @@ static int exec_external(const char *extpath, const char *extmethod,
     apr_procattr_t *procattr;
     apr_proc_t proc;
     apr_status_t rc= APR_SUCCESS;
-    char *child_env[12];
+    char *child_env[13];
     char *child_arg[MAX_ARG+2];
     const char *t;
     int i, status= -4;
@@ -470,6 +470,10 @@ static int exec_external(const char *extpath, const char *extmethod,
 #ifdef ENV_COOKIE
 	if ((cookie= apr_table_get(r->headers_in, "Cookie")) != NULL)
 	    child_env[i++]= apr_pstrcat(p, ENV_COOKIE"=", cookie, NULL);
+#endif
+		
+#ifdef _WINDOWS
+    child_env[i++]= apr_pstrcat(r->pool, "SystemRoot=", getenv("SystemRoot"), NULL);
 #endif
 	/* NOTE:  If you add environment variables,
 	 *   remember to increase the size of the child_env[] array */

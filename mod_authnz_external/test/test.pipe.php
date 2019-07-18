@@ -20,6 +20,8 @@ $pass = trim(fgets(STDIN));
 // Print them to the error_log file
 fwrite(STDERR, $prog . ": user='" . $user . "' pass='" . $pass . "'\n");
 
+// NOTE: $_ENV is only populated if the "variables_order" php.ini setting 
+//       contains "E". Alternatively use getenv(). See GitHub issue #16.
 foreach ($_ENV as $k => $v)
 {
 	fwrite(STDERR, $prog . ': ' . $k . '=' . $v . "\n");

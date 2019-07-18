@@ -303,7 +303,7 @@ instructions to your server configuration.
 	    typically used as config file path.  The ":" is required even if
 	    the <data> is an empty string.
 
-	In the old-style syntax, the path declaration should always preced
+	In the old-style syntax, the path declaration should always precede
 	the method declaration, and the method declaration can be omitted if
 	you want the default.
 

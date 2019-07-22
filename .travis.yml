@@ -17,7 +17,6 @@ addons:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install apache-httpd --params '/installLocation:C:\' ; fi
-  - cd mod_authnz_external
 
 script:
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then make ; fi

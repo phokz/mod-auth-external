@@ -512,8 +512,8 @@ static int exec_external(const char *extpath, const char *extmethod,
 	((rc= apr_procattr_detach_set(procattr, isdaemon)) != APR_SUCCESS) ||
 
 	/* function to call if child has error after fork, before exec */
-	((rc= apr_procattr_child_errfn_set(procattr, extchilderr)
-	      != APR_SUCCESS)))
+	((rc= apr_procattr_child_errfn_set(procattr, extchilderr))
+	      != APR_SUCCESS))
     {
 	/* Failed.  Probably never happens. */
     	ap_log_rerror(APLOG_MARK, APLOG_ERR, rc, r,

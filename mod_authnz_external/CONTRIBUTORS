@@ -1,0 +1,52 @@
+
+mod_authnz_external is based on code from the following sources:
+------------------------------------------------------------------
+
+ * Original author: Nathan Neulinger (nneul@umr.edu)
+ * Based on code from The Apache Group
+
+ * Previous maintainers:
+ --------------------------------------------------
+	Tyler Allison		(allison@nas.nasa.gov)
+	Jan Wolter			(unixpapa.com)
+
+ * Past contributors (from CHANGES):
+ --------------------------------------------------
+	Various unnamed contributors
+	Karyl Stein			(xenon313@arbornet.org)
+	Peter Arnold		(PJArnold@uq.net.au)
+	Mike Burns			(burns@cac.psu.edu)
+	Rudi Heitbaum		(rudi@darx.com)
+	Piotr Klaban		(makler@oryl.man.torun.pl)
+	Bradley S. Huffman	(hip@a.cs.okstate.edu)
+	Niall Daley			(niall@neoworks.com)
+	Charles Clancy		(mgrtcc@cs.rose-hulman.edu)
+	Matthew Kirkwood	(matthew@dev.sportingbet.com)
+	Phil Benchoff		(benchoff@vt.edu)
+	Dan Thibadeau		(dan_thibadeau@hp.com)
+	Jeroen Roodnat		(jroodnat@xs4all.nl)
+	Mathieu Legare		(legare@uqtr.ca)
+	Anders Nordby		(anders@fix.no)
+	Sven Koch			(haegar@sdinet.de)
+	Dave Woolaway		(dave@watersheep.org)
+	Joshua PolterocK	(joshuap@sdsc.edu)
+	Steve Horan			(sjh-mae@horan.net.au)
+	Peter Eggimann		(egp@zhwin.ch)
+	Guenter Knauf		(gk@gknw.de)
+	Olivier Thauvin		(nanardon at mandriva dot org)
+	Peter Crawshaw		(pcrawshaw@mta.ca)
+	Stefan Mehlhorn
+	Andreas Ntaflos
+	Hai Zaar
+	David Homborg
+	Claus Andersen
+	ddarbyson
+	Guoan Hu
+	davidsansome
+	cjwatson
+	Vijay
+	dcb314
+	Michal Pokorny		(agentydragon@gmail.com)
+	klemens/ka7
+	Josef Liska			(josef.liska@virtualmaster.com)
+	Micah Andersen/Baptist International Missions, Inc. (micah@bimi.org)

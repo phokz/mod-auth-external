@@ -1,5 +1,7 @@
 /* ====================================================================
  * Copyright (c) 1995 The Apache Group.  All rights reserved.
+ * Copyright (c) Nathan Neulinger, Tyler Allison, Jan Wolter and 
+ *               other contributors. Please see CONTRIBUTORS.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

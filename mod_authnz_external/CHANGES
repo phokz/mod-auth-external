@@ -1,3 +1,17 @@
+v3.3.3   (Josef Liska & Micah Andersen - July 22, 2019)
+----------------------------------------------
+ * Added METHOD environment variable to retrieve the HTTP request method 
+   (e.g. GET, HEAD, POST, OPTIONS, etc.). Thanks to Vijay from Google Code.
+ * Fixed a bug with incorrect parenthesis grouping when checking the result
+   of the external process in exec_external(). Thanks to @dcb314.
+ * Added the "GroupExternalAuthNCheck Off" directive to disable the check
+   for a previously authenticated user when using *only* the group 
+   authorization module. If you use *any* user authentication module in the
+   same context, this may be undesirable. Thanks to Micah Andersen/BIMI.
+ * Fix launching external processes on Windows - many programs require the
+   %SystemRoot% environment variable to function properly. Thanks to Micah
+   Andersen/BIMI.
+
 v3.3.2   (Jan Wolter - Dec 12, 2013)
 ----------------------------------------------
  * Replaced reference to remote_ip field of the connection record with
@@ -7,6 +21,9 @@ v3.3.2   (Jan Wolter - Dec 12, 2013)
    ddarbyson for reporting this, and Guoan Hu for posting the fix.
  * Added test/test.pipe.php, a PHP version of test/test.pipe contributed
    by Claus Andersen.
+ * Spelling fixes (as seen on lintian.debian.org). Thanks to klemens/ka7.
+ * Fixed Windows build by defining out Unix-specific signal code. Thanks
+   to Michal Pokorny <agentydragon@gmail.com>.
 
 v3.3.1   (Jan Wolter - Oct 12, 2011)
 ----------------------------------------------

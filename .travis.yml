@@ -1,0 +1,12 @@
+language: c
+
+addons:
+  apt:
+    packages:
+      - apache2
+      - apache2-dev
+
+before_install:
+  - cd mod_authnz_external
+
+script: make && sudo make install

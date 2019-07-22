@@ -1,12 +1,33 @@
 language: c
 
+os:
+  - linux
+  - osx
+  - windows
+
 addons:
+  homebrew:
+    packages:
+      - httpd
+    update: true
   apt:
     packages:
       - apache2
       - apache2-dev
 
 before_install:
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install apache-httpd --params '/installLocation:C:\' ; fi
   - cd mod_authnz_external
 
-script: make && sudo make install
+script:
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then make ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export PATH="/c/Program Files (x86)/Microsoft Visual Studio 14.0/VC/bin/amd64/:$PATH" ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then ls "/c/Program Files (x86)/Windows Kits/10/Include" ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then curl https://raw.githubusercontent.com/traviscross/apr/master/include/apr_perms_set.h -o C:\\Apache24\\include\\apr_perms_set.h ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then cl mod_authnz_external.c -c -D_WINDOWS -IC:\\Apache24\\include -I"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include" -I"C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.16299.0\\shared" -I"C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.16299.0\\ucrt" -I"C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.16299.0\\um" ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then link /out:C:\\Apache24\\modules\\mod_authnz_external.so /libpath:C:\\Apache24\\lib /libpath:"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.16299.0\\ucrt\\x64" /libpath:"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.16299.0\\um\\x64" /libpath:"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\lib\\amd64" -DLL libhttpd.lib libapr-1.lib libaprutil-1.lib mod_authnz_external.obj ; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then sudo make install ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then echo "LoadModule authnz_external_module modules/mod_authnz_external.so" >> /c/Apache24/conf/httpd.conf ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo service apache2 restart ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo brew services restart httpd ; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then sc stop Apache; sleep 60; sc start Apache ; sleep 60; sc query Apache ; fi

@@ -1,5 +1,5 @@
 # mod-authnz-external [![Build Status](https://travis-ci.org/phokz/mod-auth-external.svg?branch=master)](https://travis-ci.org/phokz/mod-auth-external)
-### External Authentication Module for Apache HTTP Server
+### External Authentication Module for Apache HTTP Server - [Apache License 1.0](https://www.apache.org/licenses/LICENSE-1.0)
 Previous Maintainers: Jan Wolter (http://www.unixpapa.com), Tyler Allison (allison@nas.nasa.gov)
   
 Original Author: Nathan Neulinger (nneul@umr.edu)

@@ -1,0 +1,28 @@
+#NMAKE format makefile for Visual Studio on Windows
+
+all: build
+
+build: mod_authnz_external.so
+
+!IF !DEFINED(VISUALSTUDIOVERSION)
+!ERROR Must be run from within the vcvars.bat environment!
+!ENDIF
+
+!IF !DEFINED(APACHEPATH)
+!ERROR APACHEPATH environment variable must point to the local installation of Apache httpd!
+!ENDIF
+
+mod_authnz_external.so: mod_authnz_external.obj
+	@echo Successful compile - linking module
+	@echo .
+	@link /dll /libpath:"$(APACHEPATH)\lib" /out:mod_authnz_external.so mod_authnz_external.obj libhttpd.lib libapr-1.lib libaprutil-1.lib
+
+mod_authnz_external.obj: mod_authnz_external.c
+	@echo Visual Studio $(VISUALSTUDIOVERSION) is installed
+	@echo Apache is installed in $(APACHEPATH)
+	@echo .
+	@cl -c -D_WINDOWS -I$(APACHEPATH)\include mod_authnz_external.c
+
+clean:
+	del mod_authnz_external.so mod_authnz_external.obj mod_authnz_external.exp mod_authnz_external.lib
+

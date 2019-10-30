@@ -278,7 +278,7 @@ static const char *set_extgroup_method(cmd_parms *cmd, void *dummy,
 static const char *append_array_slot(cmd_parms *cmd, void *struct_ptr,
 	const char *arg)
 {
-    int offset = (int)(long)cmd->info;
+	int offset = (int)(size_t)cmd->info;
 	apr_array_header_t *array =
 		*(apr_array_header_t **)((char *)struct_ptr + offset);
 

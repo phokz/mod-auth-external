@@ -394,6 +394,16 @@ static void extchilderr(apr_pool_t *p, apr_status_t err, const char *desc)
 		err, apr_strerror(err, errbuf, sizeof(errbuf)));
 }
 
+/* Called from exec_external(). Retrieves any AUTHORIZE_ headers set by
+ * other modules. */
+int extgetauthheaders(void *destarray, const char *key, const char *value) {
+	if (strstr(key, "AUTHORIZE")) {
+		apr_array_header_t *child_env = (apr_array_header_t *)destarray;
+		apr_array_push_wrapper(child_env, apr_pstrcat(child_env->pool, key, "=", value, NULL));
+	}
+	return 1; //continue
+}
+
 
 /* Run an external authentication program using the given method for passing
  * in the data.  The login name is always passed in.   Dataname is "GROUP" or
@@ -488,6 +498,9 @@ static int exec_external(const char *extpath, const char *extmethod,
 #ifdef _WINDOWS
 		apr_array_push_wrapper(child_env, apr_pstrcat(r->pool, "SystemRoot=", getenv("SystemRoot"), NULL));
 #endif
+
+		/* Retrieve any AUTHORIZE_ headers set by other modules */
+		apr_table_do(extgetauthheaders, (void *)child_env, r->subprocess_env, NULL);
 
 		/* End of environment */
 		apr_array_push_wrapper(child_env, NULL);

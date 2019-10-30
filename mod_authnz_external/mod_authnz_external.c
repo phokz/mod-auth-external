@@ -375,6 +375,13 @@ static const command_rec authnz_external_cmds[] =
 	{ NULL }
 };
 
+/* array handling helper functions */
+
+/* Appends a C string to the end of the APR array */
+static void apr_array_push_wrapper(apr_array_header_t *arr, const char *element) {
+	*(const char**)apr_array_push(arr) = element;
+}
+
 
 /* Called from apr_proc_create() if there are errors during launch of child
  * process.  Mostly just lifted from mod_cgi. */
@@ -413,7 +420,7 @@ static int exec_external(const char *extpath, const char *extmethod,
 	apr_procattr_t *procattr;
 	apr_proc_t proc;
 	apr_status_t rc = APR_SUCCESS;
-    char *child_env[13];
+	apr_array_header_t *child_env = apr_array_make(p, 16, sizeof(char *));
 	char *child_arg[MAX_ARG + 2];
 	const char *t;
 	int i, status = -4;
@@ -446,47 +453,44 @@ static int exec_external(const char *extpath, const char *extmethod,
 		if (!usepipein)
 		{
 			/* Put user name and password/group into environment */
-	    child_env[i++]= apr_pstrcat(p, ENV_USER"=", r->user, NULL);
-	    child_env[i++]= apr_pstrcat(p, dataname, "=", data, NULL);
+			apr_array_push_wrapper(child_env, apr_pstrcat(p, ENV_USER"=", r->user, NULL));
+			apr_array_push_wrapper(child_env, apr_pstrcat(p, dataname, "=", data, NULL));
 		}
 
-	child_env[i++]= apr_pstrcat(p, "PATH=", getenv("PATH"), NULL);
+		apr_array_push_wrapper(child_env, apr_pstrcat(p, "PATH=", getenv("PATH"), NULL));
 
-	child_env[i++]= apr_pstrcat(p, "AUTHTYPE=", dataname, NULL);
+		apr_array_push_wrapper(child_env, apr_pstrcat(p, "AUTHTYPE=", dataname, NULL));
 
 		remote_host = ap_get_remote_host(c, r->per_dir_config, REMOTE_HOST, NULL);
 		if (remote_host != NULL)
-	    child_env[i++]= apr_pstrcat(p, ENV_HOST"=", remote_host,NULL);
+			apr_array_push_wrapper(child_env, apr_pstrcat(p, ENV_HOST"=", remote_host, NULL));
 
 		if (r->useragent_ip)
-	    child_env[i++]= apr_pstrcat(p, ENV_IP"=", r->useragent_ip, NULL);
+			apr_array_push_wrapper(child_env, apr_pstrcat(p, ENV_IP"=", r->useragent_ip, NULL));
 
 		if (r->uri)
-	    child_env[i++]= apr_pstrcat(p, ENV_URI"=", r->uri, NULL);
+			apr_array_push_wrapper(child_env, apr_pstrcat(p, ENV_URI"=", r->uri, NULL));
 
 		if (r->method)
-		child_env[i++] = apr_pstrcat(p, ENV_METHOD"=", r->method, NULL);
+			apr_array_push_wrapper(child_env, apr_pstrcat(p, ENV_METHOD"=", r->method, NULL));
 
 		if ((host = apr_table_get(r->headers_in, "Host")) != NULL)
-	    child_env[i++]= apr_pstrcat(p, ENV_HTTP_HOST"=", host, NULL);
+			apr_array_push_wrapper(child_env, apr_pstrcat(p, ENV_HTTP_HOST"=", host, NULL));
 
 		if (dir->context)
-	    child_env[i++]= apr_pstrcat(r->pool, ENV_CONTEXT"=",
-	    	dir->context, NULL);
+			apr_array_push_wrapper(child_env, apr_pstrcat(r->pool, ENV_CONTEXT"=", dir->context, NULL));
 
 #ifdef ENV_COOKIE
 		if ((cookie = apr_table_get(r->headers_in, "Cookie")) != NULL)
-	    child_env[i++]= apr_pstrcat(p, ENV_COOKIE"=", cookie, NULL);
+			apr_array_push_wrapper(child_env, apr_pstrcat(p, ENV_COOKIE"=", cookie, NULL));
 #endif
 
 #ifdef _WINDOWS
-    child_env[i++]= apr_pstrcat(r->pool, "SystemRoot=", getenv("SystemRoot"), NULL);
+		apr_array_push_wrapper(child_env, apr_pstrcat(r->pool, "SystemRoot=", getenv("SystemRoot"), NULL));
 #endif
-	/* NOTE:  If you add environment variables,
-	 *   remember to increase the size of the child_env[] array */
 
 		/* End of environment */
-	child_env[i]= NULL;
+		apr_array_push_wrapper(child_env, NULL);
 	}
 
 	/* Construct argument array */
@@ -537,7 +541,7 @@ static int exec_external(const char *extpath, const char *extmethod,
 	/* Start the child process */
 	rc = apr_proc_create(&proc, child_arg[0],
 		(const char * const *)child_arg,
-	(const char * const *)child_env, procattr, p);
+		(const char * const *)child_env->elts, procattr, p);
 	if (rc != APR_SUCCESS)
 	{
 		ap_log_rerror(APLOG_MARK, APLOG_ERR, rc, r,

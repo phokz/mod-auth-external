@@ -273,7 +273,8 @@ static const char *set_extgroup_method(cmd_parms *cmd, void *dummy,
     return NULL;
 }
 
-/* Append an argument to an array defined by the offset */
+/* Handler for an AuthExternal directive:
+ * appends an argument to an array defined by the offset */
 static const char *append_array_slot(cmd_parms *cmd, void *struct_ptr,
 				const char *arg)
 {
@@ -300,7 +301,7 @@ static const command_rec authnz_external_cmds[] =
 	def_extauth,
 	NULL,
 	RSRC_CONF,
-	"a keyword followed by auth method and path to authentictor"),
+	"a keyword followed by auth method and path to authenticator"),
 
     AP_INIT_TAKE2("AddExternalAuth",
 	add_extauth,

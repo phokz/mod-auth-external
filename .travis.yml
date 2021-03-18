@@ -23,6 +23,7 @@ matrix:
         - sudo service apache2 restart
     - name: "Mac OS X Build"
       os: osx
+      osx_image: xcode12.2
       script:
         - make
         - sudo make install

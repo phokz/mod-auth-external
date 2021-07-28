@@ -29,6 +29,10 @@ jobs:
     - name: nmake (MSVC)
       if: runner.os == 'Windows'
       run: |
+        dir "$(Get-VisualStudioPath)"
+        dir "$(Get-VisualStudioPath)\VC"
+        dir "$(Get-VisualStudioPath)\VC\bin"
+        dir "$(Get-VisualStudioPath)\VC\Auxiliary"
         echo "call '$(Get-VisualStudioPath)\VC\Auxiliary\Build\vcvarsall.bat'" > winbuild.bat
         echo "nmake -f '$(pwd)\Makefile.win'" >> winbuild.bat
         .\winbuild.bat

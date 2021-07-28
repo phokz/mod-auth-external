@@ -1,0 +1,72 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Test building on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: install apache (ubuntu)
+      if: runner.os == 'Linux'
+      run: sudo apt-get install apache2 apache2-dev
+      
+    - name: make (GCC)
+      if: runner.os != 'Windows'
+      run: make
+      working-directory: ./mod_authnz_external
+      
+    - name: nmake (MSVC)
+      if: runner.os == 'Windows'
+      run: |
+        # find and set APACHEPATH environment variable
+        $env:APACHEPATH = Join-Path "C:\tools\" (Get-Item C:\tools\apache*).Name
+        # set it for real, GH Actions uses a new Powershell for each step
+        [System.Environment]::SetEnvironmentVariable('APACHEPATH',$env:APACHEPATH,'Machine')
+        # this 'apr_perms_set.h' header is missing from Chocolatey's Apache install
+        Invoke-WebRequest https://raw.githubusercontent.com/traviscross/apr/master/include/apr_perms_set.h -OutFile (Join-Path ($env:APACHEPATH) "include\apr_perms_set.h")
+        # call vcvars.bat to setup the environment, then call nmake to build the module
+        echo "call ""$(Get-VisualStudioPath)\VC\Auxiliary\Build\vcvars64.bat""" > winbuild.bat
+        echo "nmake -f ""$(pwd)\Makefile.win""" >> winbuild.bat
+        .\winbuild.bat
+      working-directory: ./mod_authnz_external
+      
+    - name: make install (POSIX-GCC)
+      if: runner.os != 'Windows'
+      run: sudo make install
+      working-directory: ./mod_authnz_external
+      
+    - name: install to apache (windows)
+      if: runner.os == 'Windows'
+      run: |
+        # get APACHEPATH
+        $env:APACHEPATH = [System.Environment]::GetEnvironmentVariable('APACHEPATH','Machine')
+        # manually install the compiled module in Apache
+        cp mod_authnz_external.so (Join-Path ($env:APACHEPATH) "modules\mod_authnz_external.so")
+        echo "LoadModule authnz_external_module modules/mod_authnz_external.so" >> (Join-Path ($env:APACHEPATH) "conf\httpd.conf")
+      working-directory: ./mod_authnz_external
+      
+    - name: restart apache (ubuntu)
+      if: runner.os == 'Linux'
+      run: sudo service apache2 restart
+      
+    - name: restart apache (macos)
+      if: runner.os == 'macOS'
+      run: sudo brew services restart httpd
+      
+    - name: restart apache (windows)
+      if: runner.os == 'Windows'
+      run: |
+        Stop-Service -Name w3svc
+        Set-Service Apache -StartupType Manual
+        Start-Service -Name Apache

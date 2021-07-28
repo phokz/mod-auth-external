@@ -31,6 +31,8 @@ jobs:
       run: |
         # find and set APACHEPATH environment variable
         $env:APACHEPATH = Join-Path "C:\tools\" (Get-Item C:\tools\apache*).Name
+        # set it for real, GH Actions uses a new Powershell for each step
+        [System.Environment]::SetEnvironmentVariable('APACHEPATH',$env:APACHEPATH,'Machine')
         # this 'apr_perms_set.h' header is missing from Chocolatey's Apache install
         Invoke-WebRequest https://raw.githubusercontent.com/traviscross/apr/master/include/apr_perms_set.h -OutFile (Join-Path ($env:APACHEPATH) "include\apr_perms_set.h")
         # call vcvars.bat to setup the environment, then call nmake to build the module

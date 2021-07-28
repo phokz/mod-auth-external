@@ -31,7 +31,7 @@ jobs:
       run: |
         dir "$(Get-VisualStudioPath)\VC\Auxiliary\Build"
         echo "call ""$(Get-VisualStudioPath)\VC\Auxiliary\Build\vcvars64.bat""" > winbuild.bat
-        echo "nmake -f '$(pwd)\Makefile.win'" >> winbuild.bat
+        echo "nmake -f ""$(pwd)\Makefile.win""" >> winbuild.bat
         .\winbuild.bat
       working-directory: ./mod_authnz_external
       

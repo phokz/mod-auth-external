@@ -54,3 +54,11 @@ matrix:
         - cp mod_authnz_external.so $APACHEPATH\\modules\\mod_authnz_external.so
         - echo "LoadModule authnz_external_module modules/mod_authnz_external.so" >> /c/Apache24/conf/httpd.conf
         - sc stop Apache; sleep 15; sc start Apache ; sleep 15; sc query Apache
+#      script:
+#        - export PATH="/c/Program Files (x86)/Microsoft Visual Studio 14.0/VC/bin/amd64/:$PATH"
+#        - ls "/c/Program Files (x86)/Windows Kits/10/Include"
+#        - curl https://raw.githubusercontent.com/traviscross/apr/master/include/apr_perms_set.h -o C:\\Apache24\\include\\apr_perms_set.h
+#        - cl mod_authnz_external.c -c -D_WINDOWS -IC:\\Apache24\\include -I"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include" -I"C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.16299.0\\shared" -I"C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.16299.0\\ucrt" -I"C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.16299.0\\um"
+#        - link /out:C:\\Apache24\\modules\\mod_authnz_external.so /libpath:C:\\Apache24\\lib /libpath:"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.16299.0\\ucrt\\x64" /libpath:"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.16299.0\\um\\x64" /libpath:"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\lib\\amd64" -DLL libhttpd.lib libapr-1.lib libaprutil-1.lib mod_authnz_external.obj
+#        - echo "LoadModule authnz_external_module modules/mod_authnz_external.so" >> /c/Apache24/conf/httpd.conf
+#        - sc stop Apache; sleep 15; sc start Apache ; sleep 15; sc query Apache

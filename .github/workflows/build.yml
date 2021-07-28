@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: go to source
+      run: cd mod_authnz_external
     - name: configure
       run: ./configure
     - name: make

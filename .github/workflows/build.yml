@@ -29,8 +29,11 @@ jobs:
     - name: nmake (MSVC)
       if: runner.os == 'Windows'
       run: |
+        # find and set APACHEPATH environment variable
         $env:APACHEPATH = Join-Path "C:\tools\" (Get-Item C:\tools\apache*).Name
-        dir "$(Get-VisualStudioPath)\VC\Auxiliary\Build"
+        # this 'apr_perms_set.h' header is missing from Chocolatey's Apache install
+        Invoke-WebRequest https://raw.githubusercontent.com/traviscross/apr/master/include/apr_perms_set.h -OutFile Join-Path ($env:APACHEPATH) "include\apr_perms_set.h"
+        # call vcvars.bat to setup the environment, then call nmake to build the module
         echo "call ""$(Get-VisualStudioPath)\VC\Auxiliary\Build\vcvars64.bat""" > winbuild.bat
         echo "nmake -f ""$(pwd)\Makefile.win""" >> winbuild.bat
         .\winbuild.bat

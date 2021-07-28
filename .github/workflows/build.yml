@@ -16,18 +16,37 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
     - name: install apache (ubuntu)
       if: runner.os == 'Linux'
       run: sudo apt-get install apache2 apache2-dev
+      
     - name: make
+      if: runner.os != 'Windows'
       run: make
       working-directory: ./mod_authnz_external
+      
+    - name: nmake (MSVC)
+      if: runner.os == 'Windows'
+      run: nmake -f Makefile.win
+      working-directory: ./mod_authnz_external
+      
     - name: make install
+      if: runner.os != 'Windows'
       run: sudo make install
       working-directory: ./mod_authnz_external
+      
     - name: restart apache (ubuntu)
       if: runner.os == 'Linux'
       run: sudo service apache2 restart
+      
     - name: restart apache (macos)
       if: runner.os == 'macOS'
       run: sudo brew services restart httpd
+      
+    - name: restart apache (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        Stop-Service -Name w3svc
+        Set-Service Apache -StartupType Manual
+        Start-Service -Name Apache

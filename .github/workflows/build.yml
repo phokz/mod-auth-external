@@ -49,6 +49,8 @@ jobs:
     - name: install to apache (windows)
       if: runner.os == 'Windows'
       run: |
+        # get APACHEPATH
+        $env:APACHEPATH = [System.Environment]::GetEnvironmentVariable('APACHEPATH')
         # manually install the compiled module in Apache
         cp mod_authnz_external.so (Join-Path ($env:APACHEPATH) "modules\mod_authnz_external.so")
         echo "LoadModule authnz_external_module modules/mod_authnz_external.so" >> (Join-Path ($env:APACHEPATH) "conf\httpd.conf")

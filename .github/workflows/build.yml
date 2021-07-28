@@ -28,3 +28,6 @@ jobs:
     - name: restart apache (ubuntu)
       if: runner.os == 'Linux'
       run: sudo service apache2 restart
+    - name: restart apache (macos)
+      if: runner.os == 'macOS'
+      run: sudo brew services restart httpd

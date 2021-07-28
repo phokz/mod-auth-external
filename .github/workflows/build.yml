@@ -12,12 +12,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest] # , windows-latest, macOS-latest]
 
     steps:
     - uses: actions/checkout@v2
+    - name: install apache (ubuntu)
+      run: sudo apt-get install apache2 apache2-dev
     - name: make
       run: make
+      working-directory: ./mod_authnz_external
+    - name: make install
+      run: make install
       working-directory: ./mod_authnz_external
     - name: make check
       run: make check

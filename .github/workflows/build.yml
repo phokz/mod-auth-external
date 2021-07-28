@@ -17,6 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install apache (ubuntu)
+      if: runner.os == 'Linux'
       run: sudo apt-get install apache2 apache2-dev
     - name: make
       run: make
@@ -25,4 +26,5 @@ jobs:
       run: sudo make install
       working-directory: ./mod_authnz_external
     - name: restart apache (ubuntu)
+      if: runner.os == 'Linux'
       run: sudo service apache2 restart

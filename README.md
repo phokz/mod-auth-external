@@ -1,4 +1,4 @@
-# mod-authnz-external [![Build Status](https://github.com/phokz/mod-auth-external/actions/workflows/build.yml/badge.svg?branch=github-actions-test)](https://github.com/phokz/mod-auth-external/actions/workflows/build.yml)
+# mod-authnz-external [![Build Status](https://github.com/phokz/mod-auth-external/actions/workflows/build.yml/badge.svg)](https://github.com/phokz/mod-auth-external/actions/workflows/build.yml)
 ### External Authentication Module for Apache HTTP Server - [Apache License 1.0](https://www.apache.org/licenses/LICENSE-1.0)
 Previous Maintainers: Jan Wolter (http://www.unixpapa.com), Tyler Allison (allison@nas.nasa.gov)
   

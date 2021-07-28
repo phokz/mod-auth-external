@@ -21,7 +21,7 @@ jobs:
       if: runner.os == 'Linux'
       run: sudo apt-get install apache2 apache2-dev
       
-    - name: make
+    - name: make (GCC)
       if: runner.os != 'Windows'
       run: make
       working-directory: ./mod_authnz_external
@@ -39,9 +39,17 @@ jobs:
         .\winbuild.bat
       working-directory: ./mod_authnz_external
       
-    - name: make install
+    - name: make install (POSIX-GCC)
       if: runner.os != 'Windows'
       run: sudo make install
+      working-directory: ./mod_authnz_external
+      
+    - name: install to apache (windows)
+      if: runner.os == 'Windows'
+      run: |
+        # manually install the compiled module in Apache
+        cp mod_authnz_external.so (Join-Path ($env:APACHEPATH) "modules\mod_authnz_external.so")
+        echo "LoadModule authnz_external_module modules/mod_authnz_external.so" >> (Join-Path ($env:APACHEPATH) "conf\httpd.conf")
       working-directory: ./mod_authnz_external
       
     - name: restart apache (ubuntu)
@@ -52,7 +60,7 @@ jobs:
       if: runner.os == 'macOS'
       run: sudo brew services restart httpd
       
-    - name: restart apache (Windows)
+    - name: restart apache (windows)
       if: runner.os == 'Windows'
       run: |
         Stop-Service -Name w3svc

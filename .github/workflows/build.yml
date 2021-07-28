@@ -29,6 +29,7 @@ jobs:
     - name: nmake (MSVC)
       if: runner.os == 'Windows'
       run: |
+        $env:APACHEPATH = Get-ApachePath
         dir "$(Get-VisualStudioPath)\VC\Auxiliary\Build"
         echo "call ""$(Get-VisualStudioPath)\VC\Auxiliary\Build\vcvars64.bat""" > winbuild.bat
         echo "nmake -f ""$(pwd)\Makefile.win""" >> winbuild.bat

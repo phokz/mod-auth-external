@@ -28,7 +28,10 @@ jobs:
       
     - name: nmake (MSVC)
       if: runner.os == 'Windows'
-      run: nmake -f Makefile.win
+      run: |
+        echo 'call "$(Get-VisualStudioPath)\VC\bin\amd64\vcvars64.bat"' > winbuild.bat
+        echo "nmake -f '$(pwd)\Makefile.win'" >> winbuild.bat
+        .\winbuild.bat
       working-directory: ./mod_authnz_external
       
     - name: make install

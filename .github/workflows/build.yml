@@ -26,9 +26,3 @@ jobs:
       working-directory: ./mod_authnz_external
     - name: restart apache (ubuntu)
       run: sudo service apache2 restart
-    - name: make check
-      run: make check
-      working-directory: ./mod_authnz_external
-    - name: make distcheck
-      run: make distcheck
-      working-directory: ./mod_authnz_external

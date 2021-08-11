@@ -43,10 +43,13 @@ jobs:
 
     - name: Re-root the workspace
       run: |
+        dir
         mv mod_authnz_external ..
         cd ..
         rm -rf mod-auth-external
         mv mod_authnz_external mod-auth-external
+        cd mod-auth-external
+        dir
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

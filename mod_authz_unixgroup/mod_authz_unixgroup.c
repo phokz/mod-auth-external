@@ -41,7 +41,7 @@ APR_DECLARE_OPTIONAL_FN(char*, authz_owner_get_file_group, (request_rec *r));
  * can either be unix group names or numeric group id numbers.  There must
  * be a unix login corresponding to the named user.
  */
-
+#ifdef USE_GR_MEM
 static int check_unix_group(request_rec *r, const char *grouplist)
 {
     char **p;
@@ -112,7 +112,92 @@ static int check_unix_group(request_rec *r, const char *grouplist)
     if (at != NULL) *at= '@';
     return 0;
 }
+#else
+#define MAX_USER_GRPS (4*1024)
+static int check_unix_group(request_rec *r, const char *grouplist)
+{
+    char **p;
+    struct group *grp;
+    char *user= r->user;
+    char *w, *at;
+    static gid_t groups[MAX_USER_GRPS];
+    int ngroups = MAX_USER_GRPS, i;
 
+    /* Strip @ sign and anything following it from the username.  Some
+     * authentication modules, like mod_auth_kerb like appending such
+     * stuff to user names, but an @ sign is never legal in a unix login
+     * name, so it should be safe to always discard such stuff.
+     */
+    if ((at= strchr(user, '@')) != NULL) *at= '\0';
+
+    /* Get info about login */
+    struct passwd *pwd= getpwnam(user);
+    if (pwd == NULL)
+    {
+	/* No such user - forget it */
+	if (at != NULL) *at= '@';
+	return 0;
+    }
+
+    if (getgrouplist(user, pwd->pw_gid, groups, &ngroups) < 0)
+    {
+	ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
+        "Authorization of user %s to access %s failed. "
+        " getgrouplist(errno:%s).",
+		r->user, r->uri, strerror(errno));
+		if (at != NULL) *at= '@';
+		return 0;
+    }
+
+    /* Loop through list of groups passed in */
+    while (*grouplist != '\0')
+    {
+	w= ap_getword_conf(r->pool, &grouplist);
+	if (apr_isdigit(w[0]))
+	{
+	    /* Numeric group id */
+	    int gid= atoi(w);
+
+	    /* Check if it matches the user's primary group */
+	    if (gid == pwd->pw_gid)
+	    {
+		if (at != NULL) *at= '@';
+		return 1;
+	    }
+
+	    /* Get list of group members for numeric group id */
+	    grp= getgrgid(gid);
+	}
+	else
+	{
+	    /* Get gid and list of group members for group name */
+	    grp= getgrnam(w);
+	    /* Check if gid of this group matches user's primary gid */
+	    if (grp != NULL && grp->gr_gid == pwd->pw_gid)
+	    {
+		if (at != NULL) *at= '@';
+		return 1;
+	    }
+	}
+
+	/* Walk through list of members, seeing if any match user login */
+	if (grp != NULL)
+	    for(i = 0; i < ngroups; i++)
+		{
+		    if (grp->gr_gid == groups[i])
+			{
+			    if (at != NULL) *at= '@';
+			    return 1;
+			}
+		}
+
+    }
+
+    /* Didn't find any matches, flunk him */
+    if (at != NULL) *at= '@';
+    return 0;
+}
+#endif
 static authz_status unixgroup_check_authorization(request_rec *r,
         const char *require_args, const void *parsed_require_args)
 {

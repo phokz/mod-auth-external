@@ -17,24 +17,29 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: install apache (ubuntu)
+    - name: install apache and libbsd (ubuntu)
       if: runner.os == 'Linux'
-      run: sudo apt-get install apache2 apache2-dev
-          
-    - name: install apache (macos)
+      run: sudo apt-get install apache2 apache2-dev libbsd-dev
+    
+    - name: install apache and libbsd (macos)
       if: runner.os == 'macOS'
-      run: brew install httpd
-      
+      run: |
+        # use latest master, not stable (until libbsd mac version is in stable)
+        brew developer on
+        # grab master version of libbsd with mac support
+        brew update
+        brew install httpd libbsd
+    
     - name: make mod_authnz_external (POSIX-GCC)
       if: runner.os != 'Windows'
       run: make
       working-directory: ./mod_authnz_external
-
+    
     - name: make mod_authz_unixgroup (POSIX-GCC)
       if: runner.os != 'Windows'
       run: make
       working-directory: ./mod_authz_unixgroup
-      
+    
     - name: nmake (MSVC)
       if: runner.os == 'Windows'
       run: |

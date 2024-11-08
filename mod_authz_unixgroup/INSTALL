@@ -42,12 +42,17 @@ Step 2:
 	Compile the module using the following command in the
 	mod_authz_unixgroup distribution directory:
 
-		apxs -c mod_authz_unixgroup.c
+		apxs -c mod_authz_unixgroup.c -lbsd
 
-	'Apxs' is the Apache extension tool.  It is part of the standard
-	Apache installation.  If you don't have it, then your Apache server
-	is probably not set up for handling dynamically loaded modules.
-	This should create a file named 'mod_authz_unixgroup.so'.
+	* Build using just POSIX group interfaces:
+	  	apxs -c mod_authz_unixgroup.c -DUSE_POSIX_GRP
+	  NOTE that some group providers (e.g sssd) can optionally omit gr_mem
+	  in struct grp which will break POSIX API (in addition to being slower)
+
+	* 'Apxs' is the Apache extension tool.  It is part of the standard
+	  Apache installation.  If you don't have it, then your Apache server
+	  is probably not set up for handling dynamically loaded modules.
+	  This should create a file named 'mod_authz_unixgroup.so'.
 
 Step 3:
 	Install the module.  Apxs can do this for you too.  Do the following

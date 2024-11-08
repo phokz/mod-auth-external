@@ -12,3 +12,4 @@ mod_authz_unixgroup is based on code from the following sources:
 	David Homborg
 	klemens/ka7
 	Micah Andersen/Baptist International Missions, Inc. (micah@bimi.org)
+	Joakim Tjernlund/joakim-tjernlund (joakim.tjernlund@infinera.com)

@@ -20,7 +20,11 @@
 #include <pwd.h>
 #endif
 #if HAVE_GRP_H
+#ifdef USE_POSIX_GRP
 #include <grp.h>
+#else
+#include <bsd/grp.h>
+#endif
 #endif
 #if APR_HAVE_UNISTD_H
 #include <unistd.h>
@@ -41,7 +45,7 @@ APR_DECLARE_OPTIONAL_FN(char*, authz_owner_get_file_group, (request_rec *r));
  * can either be unix group names or numeric group id numbers.  There must
  * be a unix login corresponding to the named user.
  */
-
+#ifdef USE_POSIX_GRP
 static int check_unix_group(request_rec *r, const char *grouplist)
 {
     char **p;
@@ -112,6 +116,86 @@ static int check_unix_group(request_rec *r, const char *grouplist)
     if (at != NULL) *at= '@';
     return 0;
 }
+#else
+#define MAX_USER_GRPS (4*1024)
+static int check_unix_group(request_rec *r, const char *grouplist)
+{
+	char *user = r->user;
+	char *w, *at;
+	static gid_t groups[MAX_USER_GRPS], gid;
+	int ngroups = MAX_USER_GRPS, i;
+
+	/* Strip @ sign and anything following it from the username.  Some
+	 * authentication modules, like mod_auth_kerb like appending such
+	 * stuff to user names, but an @ sign is never legal in a unix login
+	 * name, so it should be safe to always discard such stuff.
+	 */
+	if ((at = strchr(user, '@')) != NULL) *at = '\0';
+
+	/* Get info about login */
+	struct passwd *pwd = getpwnam(user);
+	if (pwd == NULL)
+	{
+		/* No such user - forget it */
+		if (at != NULL) *at = '@';
+		return 0;
+	}
+
+	if (getgrouplist(user, pwd->pw_gid, groups, &ngroups) < 0)
+	{
+		ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
+					  "Authorization of user %s to access %s failed. "
+					  " getgrouplist(errno:%s).",
+					  r->user, r->uri, strerror(errno));
+		if (at != NULL) *at = '@';
+		return 0;
+	}
+	/* Loop through list of allowed groups passed in */
+	while (*grouplist != '\0')
+	{
+		w = ap_getword_conf(r->pool, &grouplist);
+		if (apr_isdigit(w[0]))
+		{
+			/* Numeric group id */
+			gid = atoi(w);
+		}
+		else
+		{
+			/* Get gid and list of group members for group name */
+			/* from libbsd */
+			if (gid_from_group(w, &gid) < 0)
+			{
+				ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
+							  "Authorization of user %s to access %s failed. "
+							  " gid_from_group(errno:%s).",
+							  r->user, r->uri, strerror(errno));
+				if (at != NULL) *at = '@';
+				return 0;
+			}
+		}
+		/* Check if the user's primary group matches allowed group(s)  */
+		if (gid == pwd->pw_gid)
+		{
+			if (at != NULL) *at = '@';
+			return 1;
+		}
+
+		/* Walk through list of user's group(s), seeing if any match allowed group(s) */
+		for (i = 0; i < ngroups; i++)
+		{
+			if (gid == groups[i])
+			{
+				if (at != NULL) *at = '@';
+				return 1;
+			}
+		}
+	}
+
+	/* Didn't find any matches, flunk him */
+	if (at != NULL) *at = '@';
+	return 0;
+}
+#endif
 
 static authz_status unixgroup_check_authorization(request_rec *r,
         const char *require_args, const void *parsed_require_args)

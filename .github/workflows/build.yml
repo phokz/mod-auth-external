@@ -20,6 +20,10 @@ jobs:
     - name: install apache (ubuntu)
       if: runner.os == 'Linux'
       run: sudo apt-get install apache2 apache2-dev
+          
+    - name: install apache (macos)
+      if: runner.os == 'macOS'
+      run: sudo brew install httpd
       
     - name: make (GCC)
       if: runner.os != 'Windows'

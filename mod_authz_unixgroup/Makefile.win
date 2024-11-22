@@ -1,0 +1,30 @@
+#NMAKE format makefile for Visual Studio on Windows
+
+!ERROR UNIX groups do not exist on Windows!
+
+all: build
+
+build: mod_authz_unixgroup.so
+
+!IF !DEFINED(VISUALSTUDIOVERSION)
+!ERROR Must be run from within the vcvars.bat environment!
+!ENDIF
+
+!IF !DEFINED(APACHEPATH)
+!ERROR APACHEPATH environment variable must point to the local installation of Apache httpd!
+!ENDIF
+
+mod_authz_unixgroup.so: mod_authz_unixgroup.obj
+	@echo Successful compile - linking module
+	@echo .
+	@link /dll /libpath:"$(APACHEPATH)\lib" /out:mod_authz_unixgroup.so mod_authz_unixgroup.obj libhttpd.lib libapr-1.lib libaprutil-1.lib libc.lib
+
+mod_authz_unixgroup.obj: mod_authz_unixgroup.c
+	@echo Visual Studio $(VISUALSTUDIOVERSION) is installed
+	@echo Apache is installed in $(APACHEPATH)
+	@echo .
+	@cl -c -D_WINDOWS -I$(APACHEPATH)\include mod_authz_unixgroup.c
+
+clean:
+	del mod_authz_unixgroup.so mod_authz_unixgroup.obj mod_authz_unixgroup.exp mod_authz_unixgroup.lib
+

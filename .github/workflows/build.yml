@@ -23,7 +23,7 @@ jobs:
           
     - name: install apache (macos)
       if: runner.os == 'macOS'
-      run: sudo brew install httpd
+      run: brew install httpd
       
     - name: make (GCC)
       if: runner.os != 'Windows'
@@ -66,7 +66,7 @@ jobs:
       
     - name: restart apache (macos)
       if: runner.os == 'macOS'
-      run: sudo brew services restart httpd
+      run: brew services restart httpd
       
     - name: restart apache (windows)
       if: runner.os == 'Windows'

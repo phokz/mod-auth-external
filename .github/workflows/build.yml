@@ -25,10 +25,15 @@ jobs:
       if: runner.os == 'macOS'
       run: brew install httpd
       
-    - name: make (GCC)
+    - name: make mod_authnz_external (POSIX-GCC)
       if: runner.os != 'Windows'
       run: make
       working-directory: ./mod_authnz_external
+
+    - name: make mod_authz_unixgroup (POSIX-GCC)
+      if: runner.os != 'Windows'
+      run: make
+      working-directory: ./mod_authz_unixgroup
       
     - name: nmake (MSVC)
       if: runner.os == 'Windows'
@@ -45,10 +50,15 @@ jobs:
         .\winbuild.bat
       working-directory: ./mod_authnz_external
       
-    - name: make install (POSIX-GCC)
+    - name: make install mod_authnz_external (POSIX-GCC)
       if: runner.os != 'Windows'
       run: sudo make install
       working-directory: ./mod_authnz_external
+
+    - name: make install mod_authz_unixgroup (POSIX-GCC)
+      if: runner.os != 'Windows'
+      run: sudo make install
+      working-directory: ./mod_authz_unixgroup
       
     - name: install to apache (windows)
       if: runner.os == 'Windows'

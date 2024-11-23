@@ -1,4 +1,4 @@
-/* Copyright 2008 Jan Wolter - See LICENSE and NOTICE */
+/* Copyright 2008 Jan Wolter and other contributors. Please see LICENSE and CONTRIBUTORS */
 
 #include "apr_lib.h"
 
@@ -17,17 +17,17 @@
 #include "http_protocol.h"
 #include "http_request.h"	/* for ap_hook_(check_user_id | auth_checker)*/
 #if HAVE_PWD_H
-#include <pwd.h>
+	#include <pwd.h>
 #endif
 #if HAVE_GRP_H
-#ifdef USE_POSIX_GRP
-#include <grp.h>
-#else
-#include <bsd/grp.h>
-#endif
+	#ifdef USE_POSIX_GRP
+		#include <grp.h>
+	#else
+		#include <bsd/grp.h>
+	#endif
 #endif
 #if APR_HAVE_UNISTD_H
-#include <unistd.h>
+	#include <unistd.h>
 #endif
 
 /*

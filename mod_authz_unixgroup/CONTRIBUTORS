@@ -3,7 +3,7 @@ mod_authz_unixgroup is based on code from the following sources:
 ------------------------------------------------------------------
 
  * Original author: Jan Wolter (unixpapa.com)
- * Based on code from The Apache Group
+ * Based on code from The Apache Software Foundation (http://www.apache.org/).
 
  * Past contributors (from CHANGES):
  --------------------------------------------------

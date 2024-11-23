@@ -1,15 +1,18 @@
-                       Mod_Authz_Unixgroup version 1.1.0
+                       Mod_Authz_Unixgroup version 1.2.0
 
-              Author:  Jan Wolter
-	     Website:  http://www.unixpapa.com/mod_authz_unixgroup/
-	    Requires:  Apache 2.3 or later on a Unix server
-                       (for Apache 2.2 use mod_authz_unixgroup 1.0.x)
+	Original Author:  Jan Wolter
+	        Website:  http://www.unixpapa.com/mod_authz_unixgroup/
+	       Requires:  Apache 2.3 or later on a Unix server
+	                   (for Apache 2.2 use mod_authz_unixgroup 1.0.x)
 
 Mod_Authz_Unixgroup is a unix group access control modules for Apache.  If
 you are having users authenticate with real Unix login ID over the net, using
 something like my mod_authnz_external/pwauth combination, and you want to do
 access control based on unix group membership, then mod_authz_unixgroup is
 exactly what you need.
+
+NOTE: Mod_Authz_Unixgroup 1.2.x and up require libbsd or the equivalent
+bsd-standard group function support. See CHANGES or PR#55 for details.
 
 Let's say that you were using this with mod_authnz_external and pwauth.  Your
 .htaccess file for a protected directory would probably start with the
@@ -52,7 +55,7 @@ mod_authz_unixgroup will take the part before the @-sign as the username
 and ignore the rest.
 
 Mod_authnz_external is available from:
-   http://code.google.com/p/mod-auth-external/
+   https://github.com/phokz/mod-auth-external
 
 Pwauth is available from:
    http://code.google.com/p/pwauth/

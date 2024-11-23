@@ -1,3 +1,16 @@
+v1.2.0   (Josef Liska & Micah Andersen - Nov 22, 2024)
+------------------------------------------------------
+ * Fix compatibility issues with modern unix auth services, such as sssd,
+   due to optimizations for large directories (e.g. LDAP) removing the
+   complete group membership list (grmem). Thanks to Joakim Tjernlund.
+ * NOTE: builds across all platforms now *require* libbsd or the equivalent
+   bsd-standard group function support.
+ * macOS build support, with the latest homebrew-core libbsd update.
+ * Added cross-platform makefiles (macOS & linux only; Windows does not have
+   UNIX groups, so not supported). Thanks to Micah Andersen/BIMI.
+ * GitHub Actions build testing on linux & macOS. Thanks to Micah Andersen/BIMI.
+ * Copyright information was consolidated in CONTRIBUTORS for consistency.
+
 v1.1.0   (Jan Wolter - Oct 6, 2011)
 -----------------------------------
  * Revised to work as an access control provider in Apache 2.4.
@@ -7,6 +20,7 @@ v1.1.0   (Jan Wolter - Oct 6, 2011)
  * Eliminated "AuthzUnixgroupAuthoritative off" directive because the whole
    concept of authoritativeness is dead for access control providers in
    Apache 2.4.
+ * Spelling fixes (as seen on lintian.debian.org). Thanks to klemens/ka7.
 
 v1.0.3   (Jan Wolter - Oct 6, 2011)
 ------------------------------------

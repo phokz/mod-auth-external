@@ -6,7 +6,7 @@ NOTES:
    mod_authz_unixgroup:
 
      Apache 2.2.x    requires    mod_authz_unixgroup 1.0.x
-     Apache 2.4.x    requires    mod_authz_unixgroup 1.1.x
+     Apache 2.4.x    requires    mod_authz_unixgroup 1.1.0 or later
 
  * There are two ways of installing mod_authz_unixgroup. 
 
@@ -144,6 +144,11 @@ by a group of which the user is a member.
 
 Changes from Previous Versions:
 -------------------------------
+
+NOTE: New in 1.2.x, builds across all platforms now *REQUIRE* libbsd or the
+equivalent bsd-standard group function support. This was necessary to fix
+compatibility issues with modern auth providers such as sssd. See CHANGES
+and PR #55 for details.
 
 Previous versions of mod_authz_unixgroup needed a 'AuthzUnixgroup on' to
 tell Apache that the "Require file-group" directive was supposed to be

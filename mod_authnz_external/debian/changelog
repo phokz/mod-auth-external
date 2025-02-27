@@ -1,0 +1,25 @@
+libapache2-mod-authnz-external (3.3.2-2) unstable; urgency=medium
+
+  * QA upload.
+  * Make package reproducible by stop embedding the build path in 
+    compiled files.
+  * Bump Standards-Version to 4.6.1.
+
+ -- Philip Rinn <rinni@debian.org>  Fri, 11 Nov 2022 22:49:32 +0100
+
+libapache2-mod-authnz-external (3.3.2-1) unstable; urgency=medium
+
+  * QA upload.
+  * Set maintainer to Debian QA Group <packages@qa.debian.org>. (see: #673655)
+
+ -- Marcos Talau <talau@debian.org>  Wed, 09 Nov 2022 14:11:13 -0300
+
+libapache2-mod-authnz-external (3.3.2-0.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Use "dh". (Closes: #999218)
+
+ -- Christoph Berg <myon@debian.org>  Fri, 07 Jan 2022 15:02:32 +0100
+
+# Older entries have been removed from this changelog.
+# To read the complete changelog use `apt changelog libapache2-mod-authnz-external`.

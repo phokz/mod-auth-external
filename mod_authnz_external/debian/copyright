@@ -1,0 +1,58 @@
+This package was debianized for Ubuntu by Chuck Short <zulcss@ubuntu.com> on
+Tue, 08 Jan 2008 10:20:36 -0500.
+This package was debianized for Debian by Hai Zaar <haizaar@haizaar.com> on
+Tue, 31 Mar 2009 18:32:20 +0300 based on the work mentioned above.
+
+It was downloaded from http://code.google.com/p/mod-auth-external
+
+Upstream Authors: 
+
+Nathan Neulinger <nneul@umr.edu>
+Tyler Allison    <allison@nas.nasa.gov>
+Dave Woolaway    <dave@watersheep.org>
+Sven Koch        <haegar@sdinet.de>
+Jan Wolter       <jan@unixpapa.com>
+
+
+Copyright: 
+Copyright (c) 1995 The Apache Group.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in
+   the documentation and/or other materials provided with the
+   distribution.
+ 
+3. All advertising materials mentioning features or use of this
+   software must display the following acknowledgment:
+   "This product includes software developed by the Apache Group
+   for use in the Apache HTTP server project (http://www.apache.org/)."
+
+4. The names "Apache Server" and "Apache Group" must not be used to
+   endorse or promote products derived from this software without
+   prior written permission.
+
+5. Redistributions of any form whatsoever must retain the following
+   acknowledgment:
+   "This product includes software developed by the Apache Group
+   for use in the Apache HTTP server project (http://www.apache.org/)."
+
+THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
+EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
+IT'S CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGE.
+

@@ -3,7 +3,7 @@ Maintainer: Josef Liška  <josef.liska@virtualmaster.com>
 Section: universe/web
 Priority: optional
 Standards-Version: 4.7.0
-Build-Depends: libc6 (>= 2.4), apache2-api-20120211, apache2-bin (>= 2.4.16)
+Build-Depends: debhelper-compat (= 13), libc6 (>= 2.4), apache2-api-20120211, apache2-bin (>= 2.4.16)
 Recommends: pwauth
 Homepage: https://github.com/phokz/mod-auth-external
 

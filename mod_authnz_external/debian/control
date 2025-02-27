@@ -1,4 +1,4 @@
-Source: mod-authnz-external
+Source: libapache2-mod-authnz-external
 Maintainer: Josef Liška  <josef.liska@virtualmaster.com>
 Section: universe/web
 Priority: optional

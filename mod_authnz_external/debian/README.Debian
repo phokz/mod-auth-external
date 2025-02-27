@@ -1,0 +1,17 @@
+This package can be used with pwauth to provide secure auth against PAM without
+exposing /etc/shadow file.
+
+To use it on Debian, make sure to also pwauth package then add these lines to
+relevant Location or Directory section:
+    AuthBasicProvider external
+    AuthExternal pwauth
+
+And to the related virtual host section:
+   AddExternalAuth pwauth /usr/sbin/pwauth
+   SetExternalAuthMethod pwauth pipe
+
+See these links for more info:
+README file
+http://blog.innerewut.de/2007/6/26/apache-2-2-authentication-with-mod_authnz_external
+http://www.unixpapa.com/mod_auth_external
+

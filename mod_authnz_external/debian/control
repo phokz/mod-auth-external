@@ -1,4 +1,4 @@
-Source: mod_authnz_external
+Source: mod-authnz-external
 Maintainer: Josef Liška  <josef.liska@virtualmaster.com>
 Section: universe/web
 Priority: optional

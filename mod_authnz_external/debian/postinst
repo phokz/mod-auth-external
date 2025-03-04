@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+# Automatically added by dh_apache2/UNDECLARED
+if true; then
+	if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+		. /usr/share/apache2/apache2-maintscript-helper
+		for conf in authnz_external  ; do
+			apache2_invoke enmod $conf  || exit 1
+		done
+	fi
+fi
+# End automatically added section

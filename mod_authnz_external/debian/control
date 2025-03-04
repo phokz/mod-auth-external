@@ -3,7 +3,7 @@ Maintainer: Josef Liška  <josef.liska@virtualmaster.com>
 Section: web
 Priority: optional
 Standards-Version: 4.7.0
-Build-Depends: debhelper-compat (= 13), libc6 (>= 2.4), apache2-api-20120211, apache2-bin (>= 2.4.16)
+Build-Depends: debhelper-compat (= 13), libc6 (>= 2.4), apache2-api-20120211, apache2-bin (>= 2.4.16), apache2-dev, dh-apache2
 Recommends: pwauth
 Homepage: https://github.com/phokz/mod-auth-external
 
@@ -12,7 +12,7 @@ Architecture: amd64
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Original-Maintainer: Debian QA Group <packages@qa.debian.org>
 Installed-Size: 59
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: apache2-api-20120211, apache2-bin (>= 2.4.16), ${misc:Depends}
 Recommends: pwauth
 Section: web
 Priority: optional

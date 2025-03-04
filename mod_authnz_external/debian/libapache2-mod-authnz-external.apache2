@@ -1,0 +1,2 @@
+mod /usr/lib/apache2/modules/mod_authnz_external.so
+mod /etc/apache2/mods-available/authnz_external.load

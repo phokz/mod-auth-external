@@ -2,7 +2,7 @@ Source: libapache2-mod-authnz-external
 Maintainer: Josef Liška  <josef.liska@virtualmaster.com>
 Section: web
 Priority: optional
-Standards-Version: 4.6.2
+Standards-Version: 4.7.0
 Build-Depends: debhelper-compat (= 13), libc6 (>= 2.4), apache2-api-20120211, apache2-bin (>= 2.4.16), apache2-dev, dh-apache2
 Recommends: pwauth
 Homepage: https://github.com/phokz/mod-auth-external

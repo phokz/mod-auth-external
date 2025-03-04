@@ -24,3 +24,6 @@ clean:
 
 mae.tar: $(TAR)
 	tar cvf mae.tar $(TAR)
+
+debian-package:
+	debuild --rootcmd=sudo --no-tgz-check -us -uc

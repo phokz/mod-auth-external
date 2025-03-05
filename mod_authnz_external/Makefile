@@ -5,6 +5,8 @@ APXS=apxs
 TAR= README INSTALL INSTALL.HARDCODE CHANGES CONTRIBUTORS AUTHENTICATORS UPGRADE TODO \
 	mod_authnz_external.c test/* Makefile
 
+version = $(error version is not set)
+
 .DEFAULT_GOAL:= build
 .PHONY: install build clean
 

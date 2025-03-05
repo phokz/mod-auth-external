@@ -25,5 +25,11 @@ clean:
 mae.tar: $(TAR)
 	tar cvf mae.tar $(TAR)
 
+debian-package-dependencies:
+	sudo apt install build-essential fakeroot devscripts apxs apache2-dev
+
+debian-package-version:
+	dch -v $(version)
+
 debian-package:
 	debuild --rootcmd=sudo --no-tgz-check -us -uc

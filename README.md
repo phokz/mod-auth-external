@@ -4,7 +4,7 @@ Previous Maintainers: Jan Wolter (http://www.unixpapa.com), Tyler Allison (allis
   
 Original Author: Nathan Neulinger (nneul@umr.edu)
 
-**Mod_authnz_external is a flexible tool for building custom basic authentication systems for the [Apache HTTP Server](http://httpd.apache.org)**. "Basic Authentication" is a type of authentication built into the HTTP protocol, in which the browser automatically pops up a login box when the user requests a protected resource, and the login ids and passwords entered are checked by Apache. Mod_auth*_external allows the password checking normally done inside Apache to be done by an separate external program running outside of Apache.
+**Mod_authnz_external is a flexible tool for building custom basic authentication systems for the [Apache HTTP Server](http://httpd.apache.org)**. "Basic Authentication" is a type of authentication built into the HTTP protocol, in which the browser automatically pops up a login box when the user requests a protected resource, and the login ids and passwords entered are checked by Apache. Mod_auth*_external allows the password checking normally done inside Apache to be done by an separate external program running outside of Apache. This design leads to a number of important side-effects, please read [Important Considerations for Authenticator Design](../../wiki/ArchitectureConsiderations) in our wiki.
 
 ![high-level overview diagram of mod_authnz_external](/documentation/mod_authnz_external%20overview.png)
 
